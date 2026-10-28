@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta property="og:title" content="Vizinhança Eleitoral 2026">
+<meta property="og:description" content="Quem venceu a eleição presidencial de 2026 em cada local de votação do Brasil, com dados do TSE.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#14181d">
+<title>Vizinhança Eleitoral 2026</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Quem venceu a eleição presidencial de 2026 em cada local de votação do Brasil, com dados do TSE.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: mapa em tela cheia; barra de busca flutuante à esquerda; painel-boletim à direita (gaveta inferior no celular). */
+:root {
+  --bg: #dfe4e2;          /* fora do Brasil */
+  --land: #f4f4ef;        /* município sem cor */
+  --ink: #14181d;
+  --ink-2: #464e57;
+  --muted: #747c86;
+  --panel: #fbfbf8;
+  --panel-2: #eff0ec;
+  --rule: #d6d9d3;
+  --cell-line: #ffffff;
+  --muni-line: #5d656d;
+  --uf-line: #1d2228;
+  --focus: #1f5fbf;
+  --c-13: #c8102e;        /* Lula */
+  --c-22: #1f5fbf;        /* Flávio Bolsonaro */
+  --c-55: #c98500;        /* Ronaldo Caiado */
+  --c-70: #16a39a;        /* Augusto Cury e demais no modo candidato */
+  --c-outros: #8a9099;
+  --empate: #9a8fb0;
+  --font-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --shadow: 0 1px 2px rgba(20,24,29,.08), 0 8px 24px rgba(20,24,29,.10);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1016; --land: #1a2129; --ink: #eef1f4; --ink-2: #b9c0c8; --muted: #8a939d;
+    --panel: #141a21; --panel-2: #1c232c; --rule: #2a323c; --cell-line: #0f141a; --muni-line: #8a949e; --uf-line: #dfe5ea;
+    --focus: #4b8ef0; --c-13: #e5484d; --c-22: #4b8ef0; --c-55: #c98500; --c-70: #1aa89c; --c-outros: #79818b; --empate: #8b80a3;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b1016; --land: #1a2129; --ink: #eef1f4; --ink-2: #b9c0c8; --muted: #8a939d;
+  --panel: #141a21; --panel-2: #1c232c; --rule: #2a323c; --cell-line: #0f141a; --muni-line: #8a949e; --uf-line: #dfe5ea;
+  --focus: #4b8ef0; --c-13: #e5484d; --c-22: #4b8ef0; --c-55: #c98500; --c-70: #1aa89c; --c-outros: #79818b; --empate: #8b80a3;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.45);
+  color-scheme: dark;
+}
+.maplibregl-map{font:12px/20px Helvetica Neue,Arial,Helvetica,sans-serif;overflow:hidden;position:relative;-webkit-tap-highlight-color:rgb(0 0 0/0)}.maplibregl-canvas{left:0;position:absolute;top:0}.maplibregl-map:fullscreen{height:100%;width:100%}.maplibregl-ctrl-group button.maplibregl-ctrl-compass{touch-action:none}.maplibregl-canvas-container.maplibregl-interactive,.maplibregl-ctrl-group button.maplibregl-ctrl-compass{cursor:grab;-webkit-user-select:none;-moz-user-select:none;user-select:none}.maplibregl-canvas-container.maplibregl-interactive.maplibregl-track-pointer{cursor:pointer}.maplibregl-canvas-container.maplibregl-interactive:active,.maplibregl-ctrl-group button.maplibregl-ctrl-compass:active{cursor:grabbing}.maplibregl-canvas-container.maplibregl-touch-zoom-rotate,.maplibregl-canvas-container.maplibregl-touch-zoom-rotate .maplibregl-canvas{touch-action:pan-x pan-y}.maplibregl-canvas-container.maplibregl-touch-drag-pan,.maplibregl-canvas-container.maplibregl-touch-drag-pan .maplibregl-canvas{touch-action:pinch-zoom}.maplibregl-canvas-container.maplibregl-touch-zoom-rotate.maplibregl-touch-drag-pan,.maplibregl-canvas-container.maplibregl-touch-zoom-rotate.maplibregl-touch-drag-pan .maplibregl-canvas{touch-action:none}.maplibregl-canvas-container.maplibregl-touch-drag-pan.maplibregl-cooperative-gestures,.maplibregl-canvas-container.maplibregl-touch-drag-pan.maplibregl-cooperative-gestures .maplibregl-canvas{touch-action:pan-x pan-y}.maplibregl-ctrl-bottom-left,.maplibregl-ctrl-bottom-right,.maplibregl-ctrl-top-left,.maplibregl-ctrl-top-right{pointer-events:none;position:absolute;z-index:2}.maplibregl-ctrl-top-left{left:0;top:0}.maplibregl-ctrl-top-right{right:0;top:0}.maplibregl-ctrl-bottom-left{bottom:0;left:0}.maplibregl-ctrl-bottom-right{bottom:0;right:0}.maplibregl-ctrl{clear:both;pointer-events:auto;transform:translate(0)}.maplibregl-ctrl-top-left .maplibregl-ctrl{float:left;margin:10px 0 0 10px}.maplibregl-ctrl-top-right .maplibregl-ctrl{float:right;margin:10px 10px 0 0}.maplibregl-ctrl-bottom-left .maplibregl-ctrl{float:left;margin:0 0 10px 10px}.maplibregl-ctrl-bottom-right .maplibregl-ctrl{float:right;margin:0 10px 10px 0}.maplibregl-ctrl-group{background:#fff;border-radius:4px}.maplibregl-ctrl-group:not(:empty){box-shadow:0 0 0 2px rgba(0,0,0,.1)}@media (forced-colors:active){.maplibregl-ctrl-group:not(:empty){box-shadow:0 0 0 2px ButtonText}}.maplibregl-ctrl-group button{background-color:transparent;border:0;box-sizing:border-box;cursor:pointer;display:block;height:29px;outline:none;padding:0;width:29px}.maplibregl-ctrl-group button+button{border-top:1px solid #ddd}.maplibregl-ctrl button .maplibregl-ctrl-icon{background-position:50%;background-repeat:no-repeat;display:block;height:100%;width:100%}@media (forced-colors:active){.maplibregl-ctrl-icon{background-color:transparent}.maplibregl-ctrl-group button+button{border-top:1px solid ButtonText}}.maplibregl-ctrl button::-moz-focus-inner{border:0;padding:0}.maplibregl-ctrl-attrib-button:focus,.maplibregl-ctrl-group button:focus{box-shadow:0 0 2px 2px #0096ff}.maplibregl-ctrl button:disabled{cursor:not-allowed}.maplibregl-ctrl button:disabled .maplibregl-ctrl-icon{opacity:.25}.maplibregl-ctrl button:not(:disabled):hover{background-color:rgb(0 0 0/5%)}.maplibregl-ctrl-group button:focus:focus-visible{box-shadow:0 0 2px 2px #0096ff}.maplibregl-ctrl-group button:focus:not(:focus-visible){box-shadow:none}.maplibregl-ctrl-group button:focus:first-child{border-radius:4px 4px 0 0}.maplibregl-ctrl-group button:focus:last-child{border-radius:0 0 4px 4px}.maplibregl-ctrl-group button:focus:only-child{border-radius:inherit}.maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23333' viewBox='0 0 29 29'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13z'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23333' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5'/%3E%3C/svg%3E")}@media (forced-colors:active){.maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23fff' viewBox='0 0 29 29'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13z'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23fff' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5'/%3E%3C/svg%3E")}}@media (forced-colors:active) and (prefers-color-scheme:light){.maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13z'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5c-.75 0-1.5.75-1.5 1.5v3h-3c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h3v3c0 .75.75 1.5 1.5 1.5S16 19.75 16 19v-3h3c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-3v-3c0-.75-.75-1.5-1.5-1.5'/%3E%3C/svg%3E")}}.maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23333' viewBox='0 0 29 29'%3E%3Cpath d='M24 16v5.5c0 1.75-.75 2.5-2.5 2.5H16v-1l3-1.5-4-5.5 1-1 5.5 4 1.5-3zM6 16l1.5 3 5.5-4 1 1-4 5.5 3 1.5v1H7.5C5.75 24 5 23.25 5 21.5V16zm7-11v1l-3 1.5 4 5.5-1 1-5.5-4L6 13H5V7.5C5 5.75 5.75 5 7.5 5zm11 2.5c0-1.75-.75-2.5-2.5-2.5H16v1l3 1.5-4 5.5 1 1 5.5-4 1.5 3h1z'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath d='M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1z'/%3E%3C/svg%3E")}@media (forced-colors:active){.maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23fff' viewBox='0 0 29 29'%3E%3Cpath d='M24 16v5.5c0 1.75-.75 2.5-2.5 2.5H16v-1l3-1.5-4-5.5 1-1 5.5 4 1.5-3zM6 16l1.5 3 5.5-4 1 1-4 5.5 3 1.5v1H7.5C5.75 24 5 23.25 5 21.5V16zm7-11v1l-3 1.5 4 5.5-1 1-5.5-4L6 13H5V7.5C5 5.75 5.75 5 7.5 5zm11 2.5c0-1.75-.75-2.5-2.5-2.5H16v1l3 1.5-4 5.5 1 1 5.5-4 1.5 3h1z'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23fff' viewBox='0 0 29 29'%3E%3Cpath d='M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1z'/%3E%3C/svg%3E")}}@media (forced-colors:active) and (prefers-color-scheme:light){.maplibregl-ctrl button.maplibregl-ctrl-fullscreen .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath d='M24 16v5.5c0 1.75-.75 2.5-2.5 2.5H16v-1l3-1.5-4-5.5 1-1 5.5 4 1.5-3zM6 16l1.5 3 5.5-4 1 1-4 5.5 3 1.5v1H7.5C5.75 24 5 23.25 5 21.5V16zm7-11v1l-3 1.5 4 5.5-1 1-5.5-4L6 13H5V7.5C5 5.75 5.75 5 7.5 5zm11 2.5c0-1.75-.75-2.5-2.5-2.5H16v1l3 1.5-4 5.5 1 1 5.5-4 1.5 3h1z'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-shrink .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath d='M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1z'/%3E%3C/svg%3E")}}.maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23333' viewBox='0 0 29 29'%3E%3Cpath d='m10.5 14 4-8 4 8z'/%3E%3Cpath fill='%23ccc' d='m10.5 16 4 8 4-8z'/%3E%3C/svg%3E")}@media (forced-colors:active){.maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23fff' viewBox='0 0 29 29'%3E%3Cpath d='m10.5 14 4-8 4 8z'/%3E%3Cpath fill='%23ccc' d='m10.5 16 4 8 4-8z'/%3E%3C/svg%3E")}}@media (forced-colors:active) and (prefers-color-scheme:light){.maplibregl-ctrl button.maplibregl-ctrl-compass .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath d='m10.5 14 4-8 4 8z'/%3E%3Cpath fill='%23ccc' d='m10.5 16 4 8 4-8z'/%3E%3C/svg%3E")}}.maplibregl-ctrl button.maplibregl-ctrl-terrain .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='%23333' viewBox='0 0 22 22'%3E%3Cpath d='m1.754 13.406 4.453-4.851 3.09 3.09 3.281 3.277.969-.969-3.309-3.312 3.844-4.121 6.148 6.886h1.082v-.855l-7.207-8.07-4.84 5.187L6.169 6.57l-5.48 5.965v.871ZM.688 16.844h20.625v1.375H.688Zm0 0'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-terrain-enabled .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' fill='%2333b5e5' viewBox='0 0 22 22'%3E%3Cpath d='m1.754 13.406 4.453-4.851 3.09 3.09 3.281 3.277.969-.969-3.309-3.312 3.844-4.121 6.148 6.886h1.082v-.855l-7.207-8.07-4.84 5.187L6.169 6.57l-5.48 5.965v.871ZM.688 16.844h20.625v1.375H.688Zm0 0'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23333' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23aaa' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Cpath fill='red' d='m14 5 1 1-9 9-1-1z'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%2333b5e5' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active-error .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23e58978' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%2333b5e5' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background-error .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23e54e33' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-waiting .maplibregl-ctrl-icon{animation:maplibregl-spin 2s linear infinite}@media (forced-colors:active){.maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23fff' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23999' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Cpath fill='red' d='m14 5 1 1-9 9-1-1z'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%2333b5e5' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-active-error .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23e58978' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%2333b5e5' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate.maplibregl-ctrl-geolocate-background-error .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23e54e33' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3C/svg%3E")}}@media (forced-colors:active) and (prefers-color-scheme:light){.maplibregl-ctrl button.maplibregl-ctrl-geolocate .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3C/svg%3E")}.maplibregl-ctrl button.maplibregl-ctrl-geolocate:disabled .maplibregl-ctrl-icon{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' fill='%23666' viewBox='0 0 20 20'%3E%3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1m0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7'/%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Cpath fill='red' d='m14 5 1 1-9 9-1-1z'/%3E%3C/svg%3E")}}@keyframes maplibregl-spin{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}a.maplibregl-ctrl-logo{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='23' fill='none'%3E%3Cpath fill='%23000' fill-opacity='.4' fill-rule='evenodd' d='M17.408 16.796h-1.827l2.501-12.095h.198l3.324 6.533.988 2.19.988-2.19 3.258-6.533h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.929 5.644h-.098l-2.914-5.644-.757-1.71-.345 1.71zm1.958-3.42-.726 3.663a1.255 1.255 0 0 1-1.232 1.011h-1.827a1.255 1.255 0 0 1-1.229-1.509l2.501-12.095a1.255 1.255 0 0 1 1.23-1.001h.197a1.25 1.25 0 0 1 1.12.685l3.19 6.273 3.125-6.263a1.25 1.25 0 0 1 1.123-.695h.181a1.255 1.255 0 0 1 1.227.991l1.443 6.71a5 5 0 0 1 .314-.787l.009-.016a4.6 4.6 0 0 1 1.777-1.887c.782-.46 1.668-.667 2.611-.667a4.6 4.6 0 0 1 1.7.32l.306.134c.21-.16.474-.256.759-.256h1.694a1.255 1.255 0 0 1 1.212.925 1.255 1.255 0 0 1 1.212-.925h1.711c.284 0 .545.094.755.252.613-.3 1.312-.45 2.075-.45 1.356 0 2.557.445 3.482 1.4q.47.48.763 1.064V4.701a1.255 1.255 0 0 1 1.255-1.255h1.86A1.255 1.255 0 0 1 54.44 4.7v9.194h2.217c.19 0 .37.043.532.118v-4.77c0-.356.147-.678.385-.906a2.42 2.42 0 0 1-.682-1.71c0-.665.267-1.253.735-1.7a2.45 2.45 0 0 1 1.722-.674 2.43 2.43 0 0 1 1.705.675q.318.302.504.683V4.7a1.255 1.255 0 0 1 1.255-1.255h1.744A1.255 1.255 0 0 1 65.812 4.7v3.335a4.8 4.8 0 0 1 1.526-.246c.938 0 1.817.214 2.59.69a4.47 4.47 0 0 1 1.67 1.743v-.98a1.255 1.255 0 0 1 1.256-1.256h1.777c.233 0 .451.064.639.174a3.4 3.4 0 0 1 1.567-.372c.346 0 .861.02 1.285.232a1.25 1.25 0 0 1 .689 1.004 4.7 4.7 0 0 1 .853-.588c.795-.44 1.675-.647 2.61-.647 1.385 0 2.65.39 3.525 1.396.836.938 1.168 2.173 1.168 3.528q-.001.515-.056 1.051a1.255 1.255 0 0 1-.947 1.09l.408.952a1.255 1.255 0 0 1-.477 1.552c-.418.268-.92.463-1.458.612-.613.171-1.304.244-2.049.244-1.06 0-2.043-.207-2.886-.698l-.015-.008c-.798-.48-1.419-1.135-1.818-1.963l-.004-.008a5.8 5.8 0 0 1-.548-2.512q0-.429.053-.843a1.3 1.3 0 0 1-.333-.086l-.166-.004c-.223 0-.426.062-.643.228-.03.024-.142.139-.142.59v3.883a1.255 1.255 0 0 1-1.256 1.256h-1.777a1.255 1.255 0 0 1-1.256-1.256V15.69l-.032.057a4.8 4.8 0 0 1-1.86 1.833 5.04 5.04 0 0 1-2.484.634 4.5 4.5 0 0 1-1.935-.424 1.25 1.25 0 0 1-.764.258h-1.71a1.255 1.255 0 0 1-1.256-1.255V7.687a2.4 2.4 0 0 1-.428.625c.253.23.412.561.412.93v7.553a1.255 1.255 0 0 1-1.256 1.255h-1.843a1.25 1.25 0 0 1-.894-.373c-.228.23-.544.373-.894.373H51.32a1.255 1.255 0 0 1-1.256-1.255v-1.251l-.061.117a4.7 4.7 0 0 1-1.782 1.884 4.77 4.77 0 0 1-2.485.67 5.6 5.6 0 0 1-1.485-.188l.009 2.764a1.255 1.255 0 0 1-1.255 1.259h-1.729a1.255 1.255 0 0 1-1.255-1.255v-3.537a1.255 1.255 0 0 1-1.167.793h-1.679a1.25 1.25 0 0 1-.77-.263 4.5 4.5 0 0 1-1.945.429c-.885 0-1.724-.21-2.495-.632l-.017-.01a5 5 0 0 1-1.081-.836 1.255 1.255 0 0 1-1.254 1.312h-1.81a1.255 1.255 0 0 1-1.228-.99l-.782-3.625-2.044 3.939a1.25 1.25 0 0 1-1.115.676h-.098a1.25 1.25 0 0 1-1.116-.68l-2.061-3.994zM35.92 16.63l.207-.114.223-.15q.493-.356.735-.785l.061-.118.033 1.332h1.678V9.242h-1.694l-.033 1.267q-.133-.329-.526-.658l-.032-.028a3.2 3.2 0 0 0-.668-.428l-.27-.12a3.3 3.3 0 0 0-1.235-.23q-1.136-.001-1.974.493a3.36 3.36 0 0 0-1.3 1.382q-.445.89-.444 2.074 0 1.2.51 2.107a3.8 3.8 0 0 0 1.382 1.381 3.9 3.9 0 0 0 1.893.477q.795 0 1.455-.33zm-2.789-5.38q-.576.675-.575 1.762 0 1.102.559 1.794.576.675 1.645.675a2.25 2.25 0 0 0 .934-.19 2.2 2.2 0 0 0 .468-.29l.178-.161a2.2 2.2 0 0 0 .397-.561q.244-.5.244-1.15v-.115q0-.708-.296-1.267l-.043-.077a2.2 2.2 0 0 0-.633-.709l-.13-.086-.047-.028a2.1 2.1 0 0 0-1.073-.285q-1.052 0-1.629.692zm2.316 2.706c.163-.17.28-.407.28-.83v-.114c0-.292-.06-.508-.15-.68a.96.96 0 0 0-.353-.389.85.85 0 0 0-.464-.127c-.4 0-.56.114-.664.239l-.01.012c-.148.174-.275.45-.275.945 0 .506.122.801.27.99.097.11.266.224.68.224.303 0 .504-.09.687-.269zm7.545 1.705a2.6 2.6 0 0 0 .331.423q.319.33.755.548l.173.074q.65.255 1.49.255 1.02 0 1.844-.493a3.45 3.45 0 0 0 1.316-1.4q.493-.904.493-2.089 0-1.909-.988-2.913-.988-1.02-2.584-1.02-.898 0-1.575.347a3 3 0 0 0-.415.262l-.199.166a3.4 3.4 0 0 0-.64.82V9.242h-1.712v11.553h1.729l-.017-5.134zm.53-1.138q.206.29.48.5l.155.11.053.034q.51.296 1.119.297 1.07 0 1.645-.675.577-.69.576-1.762 0-1.119-.576-1.777-.558-.675-1.645-.675-.435 0-.835.16a2 2 0 0 0-.284.136 2 2 0 0 0-.363.254 2.2 2.2 0 0 0-.46.569l-.082.162a2.6 2.6 0 0 0-.213 1.072v.115q0 .707.296 1.267l.135.211zm.964-.818a1.1 1.1 0 0 0 .367.385.94.94 0 0 0 .476.118c.423 0 .59-.117.687-.23.159-.194.28-.478.28-.95 0-.53-.133-.8-.266-.952l-.021-.025c-.078-.094-.231-.221-.68-.221a1 1 0 0 0-.503.135l-.012.007a.86.86 0 0 0-.335.343c-.073.133-.132.324-.132.614v.115a1.4 1.4 0 0 0 .14.66zm15.7-6.222q.347-.346.346-.856a1.05 1.05 0 0 0-.345-.79 1.18 1.18 0 0 0-.84-.329q-.51 0-.855.33a1.05 1.05 0 0 0-.346.79q0 .51.346.855.345.346.856.346.51 0 .839-.346zm4.337 9.314.033-1.332q.191.403.59.747l.098.081a4 4 0 0 0 .316.224l.223.122a3.2 3.2 0 0 0 1.44.322 3.8 3.8 0 0 0 1.875-.477 3.5 3.5 0 0 0 1.382-1.366q.527-.89.526-2.09 0-1.184-.444-2.073a3.24 3.24 0 0 0-1.283-1.399q-.823-.51-1.942-.51a3.5 3.5 0 0 0-1.527.344l-.086.043-.165.09a3 3 0 0 0-.33.214q-.432.315-.656.707a2 2 0 0 0-.099.198l.082-1.283V4.701h-1.744v12.095zm.473-2.509a2.5 2.5 0 0 0 .566.7q.117.098.245.18l.144.08a2.1 2.1 0 0 0 .975.232q1.07 0 1.645-.675.576-.69.576-1.778 0-1.102-.576-1.777-.56-.691-1.645-.692a2.2 2.2 0 0 0-1.015.235q-.22.113-.415.282l-.15.142a2.1 2.1 0 0 0-.42.594q-.223.479-.223 1.1v.115q0 .705.293 1.26zm2.616-.293c.157-.191.28-.479.28-.967 0-.51-.13-.79-.276-.961l-.021-.026c-.082-.1-.232-.225-.67-.225a.87.87 0 0 0-.681.279l-.012.011c-.154.155-.274.38-.274.807v.115c0 .285.057.499.144.669a1.1 1.1 0 0 0 .367.405c.137.082.28.123.455.123.423 0 .59-.118.686-.23zm8.266-3.013q.345-.13.724-.14l.069-.002q.493 0 .642.099l.247-1.794q-.196-.099-.717-.099a2.3 2.3 0 0 0-.545.063 2 2 0 0 0-.411.148 2.2 2.2 0 0 0-.4.249 2.5 2.5 0 0 0-.485.499 2.7 2.7 0 0 0-.32.581l-.05.137v-1.48h-1.778v7.553h1.777v-3.884q0-.546.159-.943a1.5 1.5 0 0 1 .466-.636 2.5 2.5 0 0 1 .399-.253 2 2 0 0 1 .224-.099zm9.784 2.656.05-.922q0-1.743-.856-2.698-.838-.97-2.584-.97-1.119-.001-2.007.493a3.46 3.46 0 0 0-1.4 1.382q-.493.906-.493 2.106 0 1.07.428 1.975.428.89 1.332 1.432.906.526 2.255.526.973 0 1.668-.185l.044-.012.135-.04q.613-.184.984-.421l-.542-1.267q-.3.162-.642.274l-.297.087q-.51.131-1.3.131-.954 0-1.497-.444a1.6 1.6 0 0 1-.192-.193q-.366-.44-.512-1.234l-.004-.021zm-5.427-1.256-.003.022h3.752v-.138q-.011-.727-.288-1.118a1 1 0 0 0-.156-.176q-.46-.428-1.316-.428-.986 0-1.494.604-.379.45-.494 1.234zm-27.053 2.77V4.7h-1.86v12.095h5.333V15.15zm7.103-5.908v7.553h-1.843V9.242h1.843z'/%3E%3Cpath fill='%23fff' d='m19.63 11.151-.757-1.71-.345 1.71-1.12 5.644h-1.827L18.083 4.7h.197l3.325 6.533.988 2.19.988-2.19L26.839 4.7h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.93 5.644h-.098l-2.913-5.644zm14.836 5.81q-1.02 0-1.893-.478a3.8 3.8 0 0 1-1.381-1.382q-.51-.906-.51-2.106 0-1.185.444-2.074a3.36 3.36 0 0 1 1.3-1.382q.839-.494 1.974-.494a3.3 3.3 0 0 1 1.234.231 3.3 3.3 0 0 1 .97.575q.396.33.527.659l.033-1.267h1.694v7.553H37.18l-.033-1.332q-.279.593-1.02 1.053a3.17 3.17 0 0 1-1.662.444zm.296-1.482q.938 0 1.58-.642.642-.66.642-1.711v-.115q0-.708-.296-1.267a2.2 2.2 0 0 0-.807-.872 2.1 2.1 0 0 0-1.119-.313q-1.053 0-1.629.692-.575.675-.575 1.76 0 1.103.559 1.795.577.675 1.645.675zm6.521-6.237h1.711v1.4q.906-1.597 2.83-1.597 1.596 0 2.584 1.02.988 1.005.988 2.914 0 1.185-.493 2.09a3.46 3.46 0 0 1-1.316 1.399 3.5 3.5 0 0 1-1.844.493q-.954 0-1.662-.329a2.67 2.67 0 0 1-1.086-.97l.017 5.134h-1.728zm4.048 6.22q1.07 0 1.645-.674.577-.69.576-1.762 0-1.119-.576-1.777-.558-.675-1.645-.675-.592 0-1.12.296-.51.28-.822.823-.296.527-.296 1.234v.115q0 .708.296 1.267.313.543.823.855.51.296 1.119.297z'/%3E%3Cpath fill='%23e1e3e9' d='M51.325 4.7h1.86v10.45h3.473v1.646h-5.333zm7.12 4.542h1.843v7.553h-1.843zm.905-1.415a1.16 1.16 0 0 1-.856-.346 1.17 1.17 0 0 1-.346-.856 1.05 1.05 0 0 1 .346-.79q.346-.329.856-.329.494 0 .839.33a1.05 1.05 0 0 1 .345.79 1.16 1.16 0 0 1-.345.855q-.33.346-.84.346zm7.875 9.133a3.17 3.17 0 0 1-1.662-.444q-.723-.46-1.004-1.053l-.033 1.332h-1.71V4.701h1.743v4.657l-.082 1.283q.279-.658 1.086-1.119a3.5 3.5 0 0 1 1.778-.477q1.119 0 1.942.51a3.24 3.24 0 0 1 1.283 1.4q.445.888.444 2.072 0 1.201-.526 2.09a3.5 3.5 0 0 1-1.382 1.366 3.8 3.8 0 0 1-1.876.477zm-.296-1.481q1.069 0 1.645-.675.577-.69.577-1.778 0-1.102-.577-1.776-.56-.691-1.645-.692a2.12 2.12 0 0 0-1.58.659q-.642.641-.642 1.694v.115q0 .71.296 1.267a2.4 2.4 0 0 0 .807.872 2.1 2.1 0 0 0 1.119.313zm5.927-6.237h1.777v1.481q.263-.757.856-1.217a2.14 2.14 0 0 1 1.349-.46q.527 0 .724.098l-.247 1.794q-.149-.099-.642-.099-.774 0-1.416.494-.626.493-.626 1.58v3.883h-1.777V9.242zm9.534 7.718q-1.35 0-2.255-.526-.904-.543-1.332-1.432a4.6 4.6 0 0 1-.428-1.975q0-1.2.493-2.106a3.46 3.46 0 0 1 1.4-1.382q.889-.495 2.007-.494 1.744 0 2.584.97.855.956.856 2.7 0 .444-.05.92h-5.43q.18 1.005.708 1.45.542.443 1.497.443.79 0 1.3-.131a4 4 0 0 0 .938-.362l.542 1.267q-.411.263-1.119.46-.708.198-1.711.197zm1.596-4.558q.016-1.02-.444-1.432-.46-.428-1.316-.428-1.728 0-1.991 1.86z'/%3E%3Cpath d='M5.074 15.948a.484.657 0 0 0-.486.659v1.84a.484.657 0 0 0 .486.659h4.101a.484.657 0 0 0 .486-.659v-1.84a.484.657 0 0 0-.486-.659zm3.56 1.16H5.617v.838h3.017z' style='fill:%23fff;fill-rule:evenodd;stroke-width:1.03600001'/%3E%3Cg style='stroke-width:1.12603545'%3E%3Cpath d='M-9.408-1.416c-3.833-.025-7.056 2.912-7.08 6.615-.02 3.08 1.653 4.832 3.107 6.268.903.892 1.721 1.74 2.32 2.902l-.525-.004c-.543-.003-.992.304-1.24.639a1.87 1.87 0 0 0-.362 1.121l-.011 1.877c-.003.402.104.787.347 1.125.244.338.688.653 1.23.656l4.142.028c.542.003.99-.306 1.238-.641a1.87 1.87 0 0 0 .363-1.121l.012-1.875a1.87 1.87 0 0 0-.348-1.127c-.243-.338-.688-.653-1.23-.656l-.518-.004c.597-1.145 1.425-1.983 2.348-2.87 1.473-1.414 3.18-3.149 3.2-6.226-.016-3.59-2.923-6.684-6.993-6.707m-.006 1.1v.002c3.274.02 5.92 2.532 5.9 5.6-.017 2.706-1.39 4.026-2.863 5.44-1.034.994-2.118 2.033-2.814 3.633-.018.041-.052.055-.075.065q-.013.004-.02.01a.34.34 0 0 1-.226.084.34.34 0 0 1-.224-.086l-.092-.077c-.699-1.615-1.768-2.669-2.781-3.67-1.454-1.435-2.797-2.762-2.78-5.478.02-3.067 2.7-5.545 5.975-5.523m-.02 2.826c-1.62-.01-2.944 1.315-2.955 2.96-.01 1.646 1.295 2.988 2.916 2.999h.002c1.621.01 2.943-1.316 2.953-2.961.011-1.646-1.294-2.988-2.916-2.998m-.005 1.1c1.017.006 1.829.83 1.822 1.89s-.83 1.874-1.848 1.867c-1.018-.006-1.829-.83-1.822-1.89s.83-1.874 1.848-1.868m-2.155 11.857 4.14.025c.271.002.49.305.487.676l-.013 1.875c-.003.37-.224.67-.495.668l-4.14-.025c-.27-.002-.487-.306-.485-.676l.012-1.875c.003-.37.224-.67.494-.668' style='color:%23000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:%23000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:evenodd;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:%23000;solid-opacity:1;vector-effect:none;fill:%23000;fill-opacity:.4;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto' transform='translate(15.553 2.85)scale(.88807)'/%3E%3Cpath d='M-9.415-.316C-12.69-.338-15.37 2.14-15.39 5.207c-.017 2.716 1.326 4.041 2.78 5.477 1.013 1 2.081 2.055 2.78 3.67l.092.076a.34.34 0 0 0 .225.086.34.34 0 0 0 .227-.083l.019-.01c.022-.009.057-.024.074-.064.697-1.6 1.78-2.64 2.814-3.634 1.473-1.414 2.847-2.733 2.864-5.44.02-3.067-2.627-5.58-5.901-5.601m-.057 8.784c1.621.011 2.944-1.315 2.955-2.96.01-1.646-1.295-2.988-2.916-2.999-1.622-.01-2.945 1.315-2.955 2.96s1.295 2.989 2.916 3' style='clip-rule:evenodd;fill:%23e1e3e9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:.4' transform='translate(15.553 2.85)scale(.88807)'/%3E%3Cpath d='M-11.594 15.465c-.27-.002-.492.297-.494.668l-.012 1.876c-.003.371.214.673.485.675l4.14.027c.271.002.492-.298.495-.668l.012-1.877c.003-.37-.215-.672-.485-.674z' style='clip-rule:evenodd;fill:%23fff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:.4' transform='translate(15.553 2.85)scale(.88807)'/%3E%3C/g%3E%3C/svg%3E");background-repeat:no-repeat;cursor:pointer;display:block;height:23px;margin:0 0 -4px -4px;overflow:hidden;width:88px}a.maplibregl-ctrl-logo.maplibregl-compact{width:14px}@media (forced-colors:active){a.maplibregl-ctrl-logo{background-color:transparent;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='23' fill='none'%3E%3Cpath fill='%23000' fill-opacity='.4' fill-rule='evenodd' d='M17.408 16.796h-1.827l2.501-12.095h.198l3.324 6.533.988 2.19.988-2.19 3.258-6.533h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.929 5.644h-.098l-2.914-5.644-.757-1.71-.345 1.71zm1.958-3.42-.726 3.663a1.255 1.255 0 0 1-1.232 1.011h-1.827a1.255 1.255 0 0 1-1.229-1.509l2.501-12.095a1.255 1.255 0 0 1 1.23-1.001h.197a1.25 1.25 0 0 1 1.12.685l3.19 6.273 3.125-6.263a1.25 1.25 0 0 1 1.123-.695h.181a1.255 1.255 0 0 1 1.227.991l1.443 6.71a5 5 0 0 1 .314-.787l.009-.016a4.6 4.6 0 0 1 1.777-1.887c.782-.46 1.668-.667 2.611-.667a4.6 4.6 0 0 1 1.7.32l.306.134c.21-.16.474-.256.759-.256h1.694a1.255 1.255 0 0 1 1.212.925 1.255 1.255 0 0 1 1.212-.925h1.711c.284 0 .545.094.755.252.613-.3 1.312-.45 2.075-.45 1.356 0 2.557.445 3.482 1.4q.47.48.763 1.064V4.701a1.255 1.255 0 0 1 1.255-1.255h1.86A1.255 1.255 0 0 1 54.44 4.7v9.194h2.217c.19 0 .37.043.532.118v-4.77c0-.356.147-.678.385-.906a2.42 2.42 0 0 1-.682-1.71c0-.665.267-1.253.735-1.7a2.45 2.45 0 0 1 1.722-.674 2.43 2.43 0 0 1 1.705.675q.318.302.504.683V4.7a1.255 1.255 0 0 1 1.255-1.255h1.744A1.255 1.255 0 0 1 65.812 4.7v3.335a4.8 4.8 0 0 1 1.526-.246c.938 0 1.817.214 2.59.69a4.47 4.47 0 0 1 1.67 1.743v-.98a1.255 1.255 0 0 1 1.256-1.256h1.777c.233 0 .451.064.639.174a3.4 3.4 0 0 1 1.567-.372c.346 0 .861.02 1.285.232a1.25 1.25 0 0 1 .689 1.004 4.7 4.7 0 0 1 .853-.588c.795-.44 1.675-.647 2.61-.647 1.385 0 2.65.39 3.525 1.396.836.938 1.168 2.173 1.168 3.528q-.001.515-.056 1.051a1.255 1.255 0 0 1-.947 1.09l.408.952a1.255 1.255 0 0 1-.477 1.552c-.418.268-.92.463-1.458.612-.613.171-1.304.244-2.049.244-1.06 0-2.043-.207-2.886-.698l-.015-.008c-.798-.48-1.419-1.135-1.818-1.963l-.004-.008a5.8 5.8 0 0 1-.548-2.512q0-.429.053-.843a1.3 1.3 0 0 1-.333-.086l-.166-.004c-.223 0-.426.062-.643.228-.03.024-.142.139-.142.59v3.883a1.255 1.255 0 0 1-1.256 1.256h-1.777a1.255 1.255 0 0 1-1.256-1.256V15.69l-.032.057a4.8 4.8 0 0 1-1.86 1.833 5.04 5.04 0 0 1-2.484.634 4.5 4.5 0 0 1-1.935-.424 1.25 1.25 0 0 1-.764.258h-1.71a1.255 1.255 0 0 1-1.256-1.255V7.687a2.4 2.4 0 0 1-.428.625c.253.23.412.561.412.93v7.553a1.255 1.255 0 0 1-1.256 1.255h-1.843a1.25 1.25 0 0 1-.894-.373c-.228.23-.544.373-.894.373H51.32a1.255 1.255 0 0 1-1.256-1.255v-1.251l-.061.117a4.7 4.7 0 0 1-1.782 1.884 4.77 4.77 0 0 1-2.485.67 5.6 5.6 0 0 1-1.485-.188l.009 2.764a1.255 1.255 0 0 1-1.255 1.259h-1.729a1.255 1.255 0 0 1-1.255-1.255v-3.537a1.255 1.255 0 0 1-1.167.793h-1.679a1.25 1.25 0 0 1-.77-.263 4.5 4.5 0 0 1-1.945.429c-.885 0-1.724-.21-2.495-.632l-.017-.01a5 5 0 0 1-1.081-.836 1.255 1.255 0 0 1-1.254 1.312h-1.81a1.255 1.255 0 0 1-1.228-.99l-.782-3.625-2.044 3.939a1.25 1.25 0 0 1-1.115.676h-.098a1.25 1.25 0 0 1-1.116-.68l-2.061-3.994zM35.92 16.63l.207-.114.223-.15q.493-.356.735-.785l.061-.118.033 1.332h1.678V9.242h-1.694l-.033 1.267q-.133-.329-.526-.658l-.032-.028a3.2 3.2 0 0 0-.668-.428l-.27-.12a3.3 3.3 0 0 0-1.235-.23q-1.136-.001-1.974.493a3.36 3.36 0 0 0-1.3 1.382q-.445.89-.444 2.074 0 1.2.51 2.107a3.8 3.8 0 0 0 1.382 1.381 3.9 3.9 0 0 0 1.893.477q.795 0 1.455-.33zm-2.789-5.38q-.576.675-.575 1.762 0 1.102.559 1.794.576.675 1.645.675a2.25 2.25 0 0 0 .934-.19 2.2 2.2 0 0 0 .468-.29l.178-.161a2.2 2.2 0 0 0 .397-.561q.244-.5.244-1.15v-.115q0-.708-.296-1.267l-.043-.077a2.2 2.2 0 0 0-.633-.709l-.13-.086-.047-.028a2.1 2.1 0 0 0-1.073-.285q-1.052 0-1.629.692zm2.316 2.706c.163-.17.28-.407.28-.83v-.114c0-.292-.06-.508-.15-.68a.96.96 0 0 0-.353-.389.85.85 0 0 0-.464-.127c-.4 0-.56.114-.664.239l-.01.012c-.148.174-.275.45-.275.945 0 .506.122.801.27.99.097.11.266.224.68.224.303 0 .504-.09.687-.269zm7.545 1.705a2.6 2.6 0 0 0 .331.423q.319.33.755.548l.173.074q.65.255 1.49.255 1.02 0 1.844-.493a3.45 3.45 0 0 0 1.316-1.4q.493-.904.493-2.089 0-1.909-.988-2.913-.988-1.02-2.584-1.02-.898 0-1.575.347a3 3 0 0 0-.415.262l-.199.166a3.4 3.4 0 0 0-.64.82V9.242h-1.712v11.553h1.729l-.017-5.134zm.53-1.138q.206.29.48.5l.155.11.053.034q.51.296 1.119.297 1.07 0 1.645-.675.577-.69.576-1.762 0-1.119-.576-1.777-.558-.675-1.645-.675-.435 0-.835.16a2 2 0 0 0-.284.136 2 2 0 0 0-.363.254 2.2 2.2 0 0 0-.46.569l-.082.162a2.6 2.6 0 0 0-.213 1.072v.115q0 .707.296 1.267l.135.211zm.964-.818a1.1 1.1 0 0 0 .367.385.94.94 0 0 0 .476.118c.423 0 .59-.117.687-.23.159-.194.28-.478.28-.95 0-.53-.133-.8-.266-.952l-.021-.025c-.078-.094-.231-.221-.68-.221a1 1 0 0 0-.503.135l-.012.007a.86.86 0 0 0-.335.343c-.073.133-.132.324-.132.614v.115a1.4 1.4 0 0 0 .14.66zm15.7-6.222q.347-.346.346-.856a1.05 1.05 0 0 0-.345-.79 1.18 1.18 0 0 0-.84-.329q-.51 0-.855.33a1.05 1.05 0 0 0-.346.79q0 .51.346.855.345.346.856.346.51 0 .839-.346zm4.337 9.314.033-1.332q.191.403.59.747l.098.081a4 4 0 0 0 .316.224l.223.122a3.2 3.2 0 0 0 1.44.322 3.8 3.8 0 0 0 1.875-.477 3.5 3.5 0 0 0 1.382-1.366q.527-.89.526-2.09 0-1.184-.444-2.073a3.24 3.24 0 0 0-1.283-1.399q-.823-.51-1.942-.51a3.5 3.5 0 0 0-1.527.344l-.086.043-.165.09a3 3 0 0 0-.33.214q-.432.315-.656.707a2 2 0 0 0-.099.198l.082-1.283V4.701h-1.744v12.095zm.473-2.509a2.5 2.5 0 0 0 .566.7q.117.098.245.18l.144.08a2.1 2.1 0 0 0 .975.232q1.07 0 1.645-.675.576-.69.576-1.778 0-1.102-.576-1.777-.56-.691-1.645-.692a2.2 2.2 0 0 0-1.015.235q-.22.113-.415.282l-.15.142a2.1 2.1 0 0 0-.42.594q-.223.479-.223 1.1v.115q0 .705.293 1.26zm2.616-.293c.157-.191.28-.479.28-.967 0-.51-.13-.79-.276-.961l-.021-.026c-.082-.1-.232-.225-.67-.225a.87.87 0 0 0-.681.279l-.012.011c-.154.155-.274.38-.274.807v.115c0 .285.057.499.144.669a1.1 1.1 0 0 0 .367.405c.137.082.28.123.455.123.423 0 .59-.118.686-.23zm8.266-3.013q.345-.13.724-.14l.069-.002q.493 0 .642.099l.247-1.794q-.196-.099-.717-.099a2.3 2.3 0 0 0-.545.063 2 2 0 0 0-.411.148 2.2 2.2 0 0 0-.4.249 2.5 2.5 0 0 0-.485.499 2.7 2.7 0 0 0-.32.581l-.05.137v-1.48h-1.778v7.553h1.777v-3.884q0-.546.159-.943a1.5 1.5 0 0 1 .466-.636 2.5 2.5 0 0 1 .399-.253 2 2 0 0 1 .224-.099zm9.784 2.656.05-.922q0-1.743-.856-2.698-.838-.97-2.584-.97-1.119-.001-2.007.493a3.46 3.46 0 0 0-1.4 1.382q-.493.906-.493 2.106 0 1.07.428 1.975.428.89 1.332 1.432.906.526 2.255.526.973 0 1.668-.185l.044-.012.135-.04q.613-.184.984-.421l-.542-1.267q-.3.162-.642.274l-.297.087q-.51.131-1.3.131-.954 0-1.497-.444a1.6 1.6 0 0 1-.192-.193q-.366-.44-.512-1.234l-.004-.021zm-5.427-1.256-.003.022h3.752v-.138q-.011-.727-.288-1.118a1 1 0 0 0-.156-.176q-.46-.428-1.316-.428-.986 0-1.494.604-.379.45-.494 1.234zm-27.053 2.77V4.7h-1.86v12.095h5.333V15.15zm7.103-5.908v7.553h-1.843V9.242h1.843z'/%3E%3Cpath fill='%23fff' d='m19.63 11.151-.757-1.71-.345 1.71-1.12 5.644h-1.827L18.083 4.7h.197l3.325 6.533.988 2.19.988-2.19L26.839 4.7h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.93 5.644h-.098l-2.913-5.644zm14.836 5.81q-1.02 0-1.893-.478a3.8 3.8 0 0 1-1.381-1.382q-.51-.906-.51-2.106 0-1.185.444-2.074a3.36 3.36 0 0 1 1.3-1.382q.839-.494 1.974-.494a3.3 3.3 0 0 1 1.234.231 3.3 3.3 0 0 1 .97.575q.396.33.527.659l.033-1.267h1.694v7.553H37.18l-.033-1.332q-.279.593-1.02 1.053a3.17 3.17 0 0 1-1.662.444zm.296-1.482q.938 0 1.58-.642.642-.66.642-1.711v-.115q0-.708-.296-1.267a2.2 2.2 0 0 0-.807-.872 2.1 2.1 0 0 0-1.119-.313q-1.053 0-1.629.692-.575.675-.575 1.76 0 1.103.559 1.795.577.675 1.645.675zm6.521-6.237h1.711v1.4q.906-1.597 2.83-1.597 1.596 0 2.584 1.02.988 1.005.988 2.914 0 1.185-.493 2.09a3.46 3.46 0 0 1-1.316 1.399 3.5 3.5 0 0 1-1.844.493q-.954 0-1.662-.329a2.67 2.67 0 0 1-1.086-.97l.017 5.134h-1.728zm4.048 6.22q1.07 0 1.645-.674.577-.69.576-1.762 0-1.119-.576-1.777-.558-.675-1.645-.675-.592 0-1.12.296-.51.28-.822.823-.296.527-.296 1.234v.115q0 .708.296 1.267.313.543.823.855.51.296 1.119.297z'/%3E%3Cpath fill='%23e1e3e9' d='M51.325 4.7h1.86v10.45h3.473v1.646h-5.333zm7.12 4.542h1.843v7.553h-1.843zm.905-1.415a1.16 1.16 0 0 1-.856-.346 1.17 1.17 0 0 1-.346-.856 1.05 1.05 0 0 1 .346-.79q.346-.329.856-.329.494 0 .839.33a1.05 1.05 0 0 1 .345.79 1.16 1.16 0 0 1-.345.855q-.33.346-.84.346zm7.875 9.133a3.17 3.17 0 0 1-1.662-.444q-.723-.46-1.004-1.053l-.033 1.332h-1.71V4.701h1.743v4.657l-.082 1.283q.279-.658 1.086-1.119a3.5 3.5 0 0 1 1.778-.477q1.119 0 1.942.51a3.24 3.24 0 0 1 1.283 1.4q.445.888.444 2.072 0 1.201-.526 2.09a3.5 3.5 0 0 1-1.382 1.366 3.8 3.8 0 0 1-1.876.477zm-.296-1.481q1.069 0 1.645-.675.577-.69.577-1.778 0-1.102-.577-1.776-.56-.691-1.645-.692a2.12 2.12 0 0 0-1.58.659q-.642.641-.642 1.694v.115q0 .71.296 1.267a2.4 2.4 0 0 0 .807.872 2.1 2.1 0 0 0 1.119.313zm5.927-6.237h1.777v1.481q.263-.757.856-1.217a2.14 2.14 0 0 1 1.349-.46q.527 0 .724.098l-.247 1.794q-.149-.099-.642-.099-.774 0-1.416.494-.626.493-.626 1.58v3.883h-1.777V9.242zm9.534 7.718q-1.35 0-2.255-.526-.904-.543-1.332-1.432a4.6 4.6 0 0 1-.428-1.975q0-1.2.493-2.106a3.46 3.46 0 0 1 1.4-1.382q.889-.495 2.007-.494 1.744 0 2.584.97.855.956.856 2.7 0 .444-.05.92h-5.43q.18 1.005.708 1.45.542.443 1.497.443.79 0 1.3-.131a4 4 0 0 0 .938-.362l.542 1.267q-.411.263-1.119.46-.708.198-1.711.197zm1.596-4.558q.016-1.02-.444-1.432-.46-.428-1.316-.428-1.728 0-1.991 1.86z'/%3E%3Cpath d='M5.074 15.948a.484.657 0 0 0-.486.659v1.84a.484.657 0 0 0 .486.659h4.101a.484.657 0 0 0 .486-.659v-1.84a.484.657 0 0 0-.486-.659zm3.56 1.16H5.617v.838h3.017z' style='fill:%23fff;fill-rule:evenodd;stroke-width:1.03600001'/%3E%3Cg style='stroke-width:1.12603545'%3E%3Cpath d='M-9.408-1.416c-3.833-.025-7.056 2.912-7.08 6.615-.02 3.08 1.653 4.832 3.107 6.268.903.892 1.721 1.74 2.32 2.902l-.525-.004c-.543-.003-.992.304-1.24.639a1.87 1.87 0 0 0-.362 1.121l-.011 1.877c-.003.402.104.787.347 1.125.244.338.688.653 1.23.656l4.142.028c.542.003.99-.306 1.238-.641a1.87 1.87 0 0 0 .363-1.121l.012-1.875a1.87 1.87 0 0 0-.348-1.127c-.243-.338-.688-.653-1.23-.656l-.518-.004c.597-1.145 1.425-1.983 2.348-2.87 1.473-1.414 3.18-3.149 3.2-6.226-.016-3.59-2.923-6.684-6.993-6.707m-.006 1.1v.002c3.274.02 5.92 2.532 5.9 5.6-.017 2.706-1.39 4.026-2.863 5.44-1.034.994-2.118 2.033-2.814 3.633-.018.041-.052.055-.075.065q-.013.004-.02.01a.34.34 0 0 1-.226.084.34.34 0 0 1-.224-.086l-.092-.077c-.699-1.615-1.768-2.669-2.781-3.67-1.454-1.435-2.797-2.762-2.78-5.478.02-3.067 2.7-5.545 5.975-5.523m-.02 2.826c-1.62-.01-2.944 1.315-2.955 2.96-.01 1.646 1.295 2.988 2.916 2.999h.002c1.621.01 2.943-1.316 2.953-2.961.011-1.646-1.294-2.988-2.916-2.998m-.005 1.1c1.017.006 1.829.83 1.822 1.89s-.83 1.874-1.848 1.867c-1.018-.006-1.829-.83-1.822-1.89s.83-1.874 1.848-1.868m-2.155 11.857 4.14.025c.271.002.49.305.487.676l-.013 1.875c-.003.37-.224.67-.495.668l-4.14-.025c-.27-.002-.487-.306-.485-.676l.012-1.875c.003-.37.224-.67.494-.668' style='color:%23000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:%23000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:evenodd;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:%23000;solid-opacity:1;vector-effect:none;fill:%23000;fill-opacity:.4;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto' transform='translate(15.553 2.85)scale(.88807)'/%3E%3Cpath d='M-9.415-.316C-12.69-.338-15.37 2.14-15.39 5.207c-.017 2.716 1.326 4.041 2.78 5.477 1.013 1 2.081 2.055 2.78 3.67l.092.076a.34.34 0 0 0 .225.086.34.34 0 0 0 .227-.083l.019-.01c.022-.009.057-.024.074-.064.697-1.6 1.78-2.64 2.814-3.634 1.473-1.414 2.847-2.733 2.864-5.44.02-3.067-2.627-5.58-5.901-5.601m-.057 8.784c1.621.011 2.944-1.315 2.955-2.96.01-1.646-1.295-2.988-2.916-2.999-1.622-.01-2.945 1.315-2.955 2.96s1.295 2.989 2.916 3' style='clip-rule:evenodd;fill:%23e1e3e9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:.4' transform='translate(15.553 2.85)scale(.88807)'/%3E%3Cpath d='M-11.594 15.465c-.27-.002-.492.297-.494.668l-.012 1.876c-.003.371.214.673.485.675l4.14.027c.271.002.492-.298.495-.668l.012-1.877c.003-.37-.215-.672-.485-.674z' style='clip-rule:evenodd;fill:%23fff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:.4' transform='translate(15.553 2.85)scale(.88807)'/%3E%3C/g%3E%3C/svg%3E")}}@media (forced-colors:active) and (prefers-color-scheme:light){a.maplibregl-ctrl-logo{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='23' fill='none'%3E%3Cpath fill='%23000' fill-opacity='.4' fill-rule='evenodd' d='M17.408 16.796h-1.827l2.501-12.095h.198l3.324 6.533.988 2.19.988-2.19 3.258-6.533h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.929 5.644h-.098l-2.914-5.644-.757-1.71-.345 1.71zm1.958-3.42-.726 3.663a1.255 1.255 0 0 1-1.232 1.011h-1.827a1.255 1.255 0 0 1-1.229-1.509l2.501-12.095a1.255 1.255 0 0 1 1.23-1.001h.197a1.25 1.25 0 0 1 1.12.685l3.19 6.273 3.125-6.263a1.25 1.25 0 0 1 1.123-.695h.181a1.255 1.255 0 0 1 1.227.991l1.443 6.71a5 5 0 0 1 .314-.787l.009-.016a4.6 4.6 0 0 1 1.777-1.887c.782-.46 1.668-.667 2.611-.667a4.6 4.6 0 0 1 1.7.32l.306.134c.21-.16.474-.256.759-.256h1.694a1.255 1.255 0 0 1 1.212.925 1.255 1.255 0 0 1 1.212-.925h1.711c.284 0 .545.094.755.252.613-.3 1.312-.45 2.075-.45 1.356 0 2.557.445 3.482 1.4q.47.48.763 1.064V4.701a1.255 1.255 0 0 1 1.255-1.255h1.86A1.255 1.255 0 0 1 54.44 4.7v9.194h2.217c.19 0 .37.043.532.118v-4.77c0-.356.147-.678.385-.906a2.42 2.42 0 0 1-.682-1.71c0-.665.267-1.253.735-1.7a2.45 2.45 0 0 1 1.722-.674 2.43 2.43 0 0 1 1.705.675q.318.302.504.683V4.7a1.255 1.255 0 0 1 1.255-1.255h1.744A1.255 1.255 0 0 1 65.812 4.7v3.335a4.8 4.8 0 0 1 1.526-.246c.938 0 1.817.214 2.59.69a4.47 4.47 0 0 1 1.67 1.743v-.98a1.255 1.255 0 0 1 1.256-1.256h1.777c.233 0 .451.064.639.174a3.4 3.4 0 0 1 1.567-.372c.346 0 .861.02 1.285.232a1.25 1.25 0 0 1 .689 1.004 4.7 4.7 0 0 1 .853-.588c.795-.44 1.675-.647 2.61-.647 1.385 0 2.65.39 3.525 1.396.836.938 1.168 2.173 1.168 3.528q-.001.515-.056 1.051a1.255 1.255 0 0 1-.947 1.09l.408.952a1.255 1.255 0 0 1-.477 1.552c-.418.268-.92.463-1.458.612-.613.171-1.304.244-2.049.244-1.06 0-2.043-.207-2.886-.698l-.015-.008c-.798-.48-1.419-1.135-1.818-1.963l-.004-.008a5.8 5.8 0 0 1-.548-2.512q0-.429.053-.843a1.3 1.3 0 0 1-.333-.086l-.166-.004c-.223 0-.426.062-.643.228-.03.024-.142.139-.142.59v3.883a1.255 1.255 0 0 1-1.256 1.256h-1.777a1.255 1.255 0 0 1-1.256-1.256V15.69l-.032.057a4.8 4.8 0 0 1-1.86 1.833 5.04 5.04 0 0 1-2.484.634 4.5 4.5 0 0 1-1.935-.424 1.25 1.25 0 0 1-.764.258h-1.71a1.255 1.255 0 0 1-1.256-1.255V7.687a2.4 2.4 0 0 1-.428.625c.253.23.412.561.412.93v7.553a1.255 1.255 0 0 1-1.256 1.255h-1.843a1.25 1.25 0 0 1-.894-.373c-.228.23-.544.373-.894.373H51.32a1.255 1.255 0 0 1-1.256-1.255v-1.251l-.061.117a4.7 4.7 0 0 1-1.782 1.884 4.77 4.77 0 0 1-2.485.67 5.6 5.6 0 0 1-1.485-.188l.009 2.764a1.255 1.255 0 0 1-1.255 1.259h-1.729a1.255 1.255 0 0 1-1.255-1.255v-3.537a1.255 1.255 0 0 1-1.167.793h-1.679a1.25 1.25 0 0 1-.77-.263 4.5 4.5 0 0 1-1.945.429c-.885 0-1.724-.21-2.495-.632l-.017-.01a5 5 0 0 1-1.081-.836 1.255 1.255 0 0 1-1.254 1.312h-1.81a1.255 1.255 0 0 1-1.228-.99l-.782-3.625-2.044 3.939a1.25 1.25 0 0 1-1.115.676h-.098a1.25 1.25 0 0 1-1.116-.68l-2.061-3.994zM35.92 16.63l.207-.114.223-.15q.493-.356.735-.785l.061-.118.033 1.332h1.678V9.242h-1.694l-.033 1.267q-.133-.329-.526-.658l-.032-.028a3.2 3.2 0 0 0-.668-.428l-.27-.12a3.3 3.3 0 0 0-1.235-.23q-1.136-.001-1.974.493a3.36 3.36 0 0 0-1.3 1.382q-.445.89-.444 2.074 0 1.2.51 2.107a3.8 3.8 0 0 0 1.382 1.381 3.9 3.9 0 0 0 1.893.477q.795 0 1.455-.33zm-2.789-5.38q-.576.675-.575 1.762 0 1.102.559 1.794.576.675 1.645.675a2.25 2.25 0 0 0 .934-.19 2.2 2.2 0 0 0 .468-.29l.178-.161a2.2 2.2 0 0 0 .397-.561q.244-.5.244-1.15v-.115q0-.708-.296-1.267l-.043-.077a2.2 2.2 0 0 0-.633-.709l-.13-.086-.047-.028a2.1 2.1 0 0 0-1.073-.285q-1.052 0-1.629.692zm2.316 2.706c.163-.17.28-.407.28-.83v-.114c0-.292-.06-.508-.15-.68a.96.96 0 0 0-.353-.389.85.85 0 0 0-.464-.127c-.4 0-.56.114-.664.239l-.01.012c-.148.174-.275.45-.275.945 0 .506.122.801.27.99.097.11.266.224.68.224.303 0 .504-.09.687-.269zm7.545 1.705a2.6 2.6 0 0 0 .331.423q.319.33.755.548l.173.074q.65.255 1.49.255 1.02 0 1.844-.493a3.45 3.45 0 0 0 1.316-1.4q.493-.904.493-2.089 0-1.909-.988-2.913-.988-1.02-2.584-1.02-.898 0-1.575.347a3 3 0 0 0-.415.262l-.199.166a3.4 3.4 0 0 0-.64.82V9.242h-1.712v11.553h1.729l-.017-5.134zm.53-1.138q.206.29.48.5l.155.11.053.034q.51.296 1.119.297 1.07 0 1.645-.675.577-.69.576-1.762 0-1.119-.576-1.777-.558-.675-1.645-.675-.435 0-.835.16a2 2 0 0 0-.284.136 2 2 0 0 0-.363.254 2.2 2.2 0 0 0-.46.569l-.082.162a2.6 2.6 0 0 0-.213 1.072v.115q0 .707.296 1.267l.135.211zm.964-.818a1.1 1.1 0 0 0 .367.385.94.94 0 0 0 .476.118c.423 0 .59-.117.687-.23.159-.194.28-.478.28-.95 0-.53-.133-.8-.266-.952l-.021-.025c-.078-.094-.231-.221-.68-.221a1 1 0 0 0-.503.135l-.012.007a.86.86 0 0 0-.335.343c-.073.133-.132.324-.132.614v.115a1.4 1.4 0 0 0 .14.66zm15.7-6.222q.347-.346.346-.856a1.05 1.05 0 0 0-.345-.79 1.18 1.18 0 0 0-.84-.329q-.51 0-.855.33a1.05 1.05 0 0 0-.346.79q0 .51.346.855.345.346.856.346.51 0 .839-.346zm4.337 9.314.033-1.332q.191.403.59.747l.098.081a4 4 0 0 0 .316.224l.223.122a3.2 3.2 0 0 0 1.44.322 3.8 3.8 0 0 0 1.875-.477 3.5 3.5 0 0 0 1.382-1.366q.527-.89.526-2.09 0-1.184-.444-2.073a3.24 3.24 0 0 0-1.283-1.399q-.823-.51-1.942-.51a3.5 3.5 0 0 0-1.527.344l-.086.043-.165.09a3 3 0 0 0-.33.214q-.432.315-.656.707a2 2 0 0 0-.099.198l.082-1.283V4.701h-1.744v12.095zm.473-2.509a2.5 2.5 0 0 0 .566.7q.117.098.245.18l.144.08a2.1 2.1 0 0 0 .975.232q1.07 0 1.645-.675.576-.69.576-1.778 0-1.102-.576-1.777-.56-.691-1.645-.692a2.2 2.2 0 0 0-1.015.235q-.22.113-.415.282l-.15.142a2.1 2.1 0 0 0-.42.594q-.223.479-.223 1.1v.115q0 .705.293 1.26zm2.616-.293c.157-.191.28-.479.28-.967 0-.51-.13-.79-.276-.961l-.021-.026c-.082-.1-.232-.225-.67-.225a.87.87 0 0 0-.681.279l-.012.011c-.154.155-.274.38-.274.807v.115c0 .285.057.499.144.669a1.1 1.1 0 0 0 .367.405c.137.082.28.123.455.123.423 0 .59-.118.686-.23zm8.266-3.013q.345-.13.724-.14l.069-.002q.493 0 .642.099l.247-1.794q-.196-.099-.717-.099a2.3 2.3 0 0 0-.545.063 2 2 0 0 0-.411.148 2.2 2.2 0 0 0-.4.249 2.5 2.5 0 0 0-.485.499 2.7 2.7 0 0 0-.32.581l-.05.137v-1.48h-1.778v7.553h1.777v-3.884q0-.546.159-.943a1.5 1.5 0 0 1 .466-.636 2.5 2.5 0 0 1 .399-.253 2 2 0 0 1 .224-.099zm9.784 2.656.05-.922q0-1.743-.856-2.698-.838-.97-2.584-.97-1.119-.001-2.007.493a3.46 3.46 0 0 0-1.4 1.382q-.493.906-.493 2.106 0 1.07.428 1.975.428.89 1.332 1.432.906.526 2.255.526.973 0 1.668-.185l.044-.012.135-.04q.613-.184.984-.421l-.542-1.267q-.3.162-.642.274l-.297.087q-.51.131-1.3.131-.954 0-1.497-.444a1.6 1.6 0 0 1-.192-.193q-.366-.44-.512-1.234l-.004-.021zm-5.427-1.256-.003.022h3.752v-.138q-.011-.727-.288-1.118a1 1 0 0 0-.156-.176q-.46-.428-1.316-.428-.986 0-1.494.604-.379.45-.494 1.234zm-27.053 2.77V4.7h-1.86v12.095h5.333V15.15zm7.103-5.908v7.553h-1.843V9.242h1.843z'/%3E%3Cpath fill='%23fff' d='m19.63 11.151-.757-1.71-.345 1.71-1.12 5.644h-1.827L18.083 4.7h.197l3.325 6.533.988 2.19.988-2.19L26.839 4.7h.181l2.6 12.095h-1.81l-1.218-5.644-.362-1.71-.658 1.71-2.93 5.644h-.098l-2.913-5.644zm14.836 5.81q-1.02 0-1.893-.478a3.8 3.8 0 0 1-1.381-1.382q-.51-.906-.51-2.106 0-1.185.444-2.074a3.36 3.36 0 0 1 1.3-1.382q.839-.494 1.974-.494a3.3 3.3 0 0 1 1.234.231 3.3 3.3 0 0 1 .97.575q.396.33.527.659l.033-1.267h1.694v7.553H37.18l-.033-1.332q-.279.593-1.02 1.053a3.17 3.17 0 0 1-1.662.444zm.296-1.482q.938 0 1.58-.642.642-.66.642-1.711v-.115q0-.708-.296-1.267a2.2 2.2 0 0 0-.807-.872 2.1 2.1 0 0 0-1.119-.313q-1.053 0-1.629.692-.575.675-.575 1.76 0 1.103.559 1.795.577.675 1.645.675zm6.521-6.237h1.711v1.4q.906-1.597 2.83-1.597 1.596 0 2.584 1.02.988 1.005.988 2.914 0 1.185-.493 2.09a3.46 3.46 0 0 1-1.316 1.399 3.5 3.5 0 0 1-1.844.493q-.954 0-1.662-.329a2.67 2.67 0 0 1-1.086-.97l.017 5.134h-1.728zm4.048 6.22q1.07 0 1.645-.674.577-.69.576-1.762 0-1.119-.576-1.777-.558-.675-1.645-.675-.592 0-1.12.296-.51.28-.822.823-.296.527-.296 1.234v.115q0 .708.296 1.267.313.543.823.855.51.296 1.119.297z'/%3E%3Cpath fill='%23e1e3e9' d='M51.325 4.7h1.86v10.45h3.473v1.646h-5.333zm7.12 4.542h1.843v7.553h-1.843zm.905-1.415a1.16 1.16 0 0 1-.856-.346 1.17 1.17 0 0 1-.346-.856 1.05 1.05 0 0 1 .346-.79q.346-.329.856-.329.494 0 .839.33a1.05 1.05 0 0 1 .345.79 1.16 1.16 0 0 1-.345.855q-.33.346-.84.346zm7.875 9.133a3.17 3.17 0 0 1-1.662-.444q-.723-.46-1.004-1.053l-.033 1.332h-1.71V4.701h1.743v4.657l-.082 1.283q.279-.658 1.086-1.119a3.5 3.5 0 0 1 1.778-.477q1.119 0 1.942.51a3.24 3.24 0 0 1 1.283 1.4q.445.888.444 2.072 0 1.201-.526 2.09a3.5 3.5 0 0 1-1.382 1.366 3.8 3.8 0 0 1-1.876.477zm-.296-1.481q1.069 0 1.645-.675.577-.69.577-1.778 0-1.102-.577-1.776-.56-.691-1.645-.692a2.12 2.12 0 0 0-1.58.659q-.642.641-.642 1.694v.115q0 .71.296 1.267a2.4 2.4 0 0 0 .807.872 2.1 2.1 0 0 0 1.119.313zm5.927-6.237h1.777v1.481q.263-.757.856-1.217a2.14 2.14 0 0 1 1.349-.46q.527 0 .724.098l-.247 1.794q-.149-.099-.642-.099-.774 0-1.416.494-.626.493-.626 1.58v3.883h-1.777V9.242zm9.534 7.718q-1.35 0-2.255-.526-.904-.543-1.332-1.432a4.6 4.6 0 0 1-.428-1.975q0-1.2.493-2.106a3.46 3.46 0 0 1 1.4-1.382q.889-.495 2.007-.494 1.744 0 2.584.97.855.956.856 2.7 0 .444-.05.92h-5.43q.18 1.005.708 1.45.542.443 1.497.443.79 0 1.3-.131a4 4 0 0 0 .938-.362l.542 1.267q-.411.263-1.119.46-.708.198-1.711.197zm1.596-4.558q.016-1.02-.444-1.432-.46-.428-1.316-.428-1.728 0-1.991 1.86z'/%3E%3Cpath d='M5.074 15.948a.484.657 0 0 0-.486.659v1.84a.484.657 0 0 0 .486.659h4.101a.484.657 0 0 0 .486-.659v-1.84a.484.657 0 0 0-.486-.659zm3.56 1.16H5.617v.838h3.017z' style='fill:%23fff;fill-rule:evenodd;stroke-width:1.03600001'/%3E%3Cg style='stroke-width:1.12603545'%3E%3Cpath d='M-9.408-1.416c-3.833-.025-7.056 2.912-7.08 6.615-.02 3.08 1.653 4.832 3.107 6.268.903.892 1.721 1.74 2.32 2.902l-.525-.004c-.543-.003-.992.304-1.24.639a1.87 1.87 0 0 0-.362 1.121l-.011 1.877c-.003.402.104.787.347 1.125.244.338.688.653 1.23.656l4.142.028c.542.003.99-.306 1.238-.641a1.87 1.87 0 0 0 .363-1.121l.012-1.875a1.87 1.87 0 0 0-.348-1.127c-.243-.338-.688-.653-1.23-.656l-.518-.004c.597-1.145 1.425-1.983 2.348-2.87 1.473-1.414 3.18-3.149 3.2-6.226-.016-3.59-2.923-6.684-6.993-6.707m-.006 1.1v.002c3.274.02 5.92 2.532 5.9 5.6-.017 2.706-1.39 4.026-2.863 5.44-1.034.994-2.118 2.033-2.814 3.633-.018.041-.052.055-.075.065q-.013.004-.02.01a.34.34 0 0 1-.226.084.34.34 0 0 1-.224-.086l-.092-.077c-.699-1.615-1.768-2.669-2.781-3.67-1.454-1.435-2.797-2.762-2.78-5.478.02-3.067 2.7-5.545 5.975-5.523m-.02 2.826c-1.62-.01-2.944 1.315-2.955 2.96-.01 1.646 1.295 2.988 2.916 2.999h.002c1.621.01 2.943-1.316 2.953-2.961.011-1.646-1.294-2.988-2.916-2.998m-.005 1.1c1.017.006 1.829.83 1.822 1.89s-.83 1.874-1.848 1.867c-1.018-.006-1.829-.83-1.822-1.89s.83-1.874 1.848-1.868m-2.155 11.857 4.14.025c.271.002.49.305.487.676l-.013 1.875c-.003.37-.224.67-.495.668l-4.14-.025c-.27-.002-.487-.306-.485-.676l.012-1.875c.003-.37.224-.67.494-.668' style='color:%23000;font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:%23000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:evenodd;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:%23000;solid-opacity:1;vector-effect:none;fill:%23000;fill-opacity:.4;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto' transform='translate(15.553 2.85)scale(.88807)'/%3E%3Cpath d='M-9.415-.316C-12.69-.338-15.37 2.14-15.39 5.207c-.017 2.716 1.326 4.041 2.78 5.477 1.013 1 2.081 2.055 2.78 3.67l.092.076a.34.34 0 0 0 .225.086.34.34 0 0 0 .227-.083l.019-.01c.022-.009.057-.024.074-.064.697-1.6 1.78-2.64 2.814-3.634 1.473-1.414 2.847-2.733 2.864-5.44.02-3.067-2.627-5.58-5.901-5.601m-.057 8.784c1.621.011 2.944-1.315 2.955-2.96.01-1.646-1.295-2.988-2.916-2.999-1.622-.01-2.945 1.315-2.955 2.96s1.295 2.989 2.916 3' style='clip-rule:evenodd;fill:%23e1e3e9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:.4' transform='translate(15.553 2.85)scale(.88807)'/%3E%3Cpath d='M-11.594 15.465c-.27-.002-.492.297-.494.668l-.012 1.876c-.003.371.214.673.485.675l4.14.027c.271.002.492-.298.495-.668l.012-1.877c.003-.37-.215-.672-.485-.674z' style='clip-rule:evenodd;fill:%23fff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.47727823;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:.4' transform='translate(15.553 2.85)scale(.88807)'/%3E%3C/g%3E%3C/svg%3E")}}.maplibregl-ctrl.maplibregl-ctrl-attrib{background-color:hsla(0,0%,100%,.5);margin:0;padding:0 5px}@media screen{.maplibregl-ctrl-attrib.maplibregl-compact{background-color:#fff;border-radius:12px;box-sizing:content-box;color:#000;margin:10px;min-height:20px;padding:2px 24px 2px 0;position:relative}.maplibregl-ctrl-attrib.maplibregl-compact-show{padding:2px 28px 2px 8px;visibility:visible}.maplibregl-ctrl-bottom-left>.maplibregl-ctrl-attrib.maplibregl-compact-show,.maplibregl-ctrl-top-left>.maplibregl-ctrl-attrib.maplibregl-compact-show{border-radius:12px;padding:2px 8px 2px 28px}.maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-inner{display:none}.maplibregl-ctrl-attrib-button{background-color:hsla(0,0%,100%,.5);background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill-rule='evenodd' viewBox='0 0 20 20'%3E%3Cpath d='M4 10a6 6 0 1 0 12 0 6 6 0 1 0-12 0m5-3a1 1 0 1 0 2 0 1 1 0 1 0-2 0m0 3a1 1 0 1 1 2 0v3a1 1 0 1 1-2 0'/%3E%3C/svg%3E");border:0;border-radius:12px;box-sizing:border-box;cursor:pointer;display:none;height:24px;outline:none;position:absolute;right:0;top:0;width:24px}.maplibregl-ctrl-attrib summary.maplibregl-ctrl-attrib-button{-webkit-appearance:none;-moz-appearance:none;appearance:none;list-style:none}.maplibregl-ctrl-attrib summary.maplibregl-ctrl-attrib-button::-webkit-details-marker{display:none}.maplibregl-ctrl-bottom-left .maplibregl-ctrl-attrib-button,.maplibregl-ctrl-top-left .maplibregl-ctrl-attrib-button{left:0}.maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button,.maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner{display:block}.maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-button{background-color:rgb(0 0 0/5%)}.maplibregl-ctrl-bottom-right>.maplibregl-ctrl-attrib.maplibregl-compact:after{bottom:0;right:0}.maplibregl-ctrl-top-right>.maplibregl-ctrl-attrib.maplibregl-compact:after{right:0;top:0}.maplibregl-ctrl-top-left>.maplibregl-ctrl-attrib.maplibregl-compact:after{left:0;top:0}.maplibregl-ctrl-bottom-left>.maplibregl-ctrl-attrib.maplibregl-compact:after{bottom:0;left:0}}@media screen and (forced-colors:active){.maplibregl-ctrl-attrib.maplibregl-compact:after{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23fff' fill-rule='evenodd' viewBox='0 0 20 20'%3E%3Cpath d='M4 10a6 6 0 1 0 12 0 6 6 0 1 0-12 0m5-3a1 1 0 1 0 2 0 1 1 0 1 0-2 0m0 3a1 1 0 1 1 2 0v3a1 1 0 1 1-2 0'/%3E%3C/svg%3E")}}@media screen and (forced-colors:active) and (prefers-color-scheme:light){.maplibregl-ctrl-attrib.maplibregl-compact:after{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill-rule='evenodd' viewBox='0 0 20 20'%3E%3Cpath d='M4 10a6 6 0 1 0 12 0 6 6 0 1 0-12 0m5-3a1 1 0 1 0 2 0 1 1 0 1 0-2 0m0 3a1 1 0 1 1 2 0v3a1 1 0 1 1-2 0'/%3E%3C/svg%3E")}}.maplibregl-ctrl-attrib a{color:rgba(0,0,0,.75);text-decoration:none}.maplibregl-ctrl-attrib a:hover{color:inherit;text-decoration:underline}.maplibregl-attrib-empty{display:none}.maplibregl-ctrl-scale{background-color:hsla(0,0%,100%,.75);border:2px solid #333;border-top:#333;box-sizing:border-box;color:#333;font-size:10px;padding:0 5px}.maplibregl-popup{display:flex;left:0;pointer-events:none;position:absolute;top:0;will-change:transform}.maplibregl-popup-anchor-top,.maplibregl-popup-anchor-top-left,.maplibregl-popup-anchor-top-right{flex-direction:column}.maplibregl-popup-anchor-bottom,.maplibregl-popup-anchor-bottom-left,.maplibregl-popup-anchor-bottom-right{flex-direction:column-reverse}.maplibregl-popup-anchor-left{flex-direction:row}.maplibregl-popup-anchor-right{flex-direction:row-reverse}.maplibregl-popup-tip{border:10px solid transparent;height:0;width:0;z-index:1}.maplibregl-popup-anchor-top .maplibregl-popup-tip{align-self:center;border-bottom-color:#fff;border-top:none}.maplibregl-popup-anchor-top-left .maplibregl-popup-tip{align-self:flex-start;border-bottom-color:#fff;border-left:none;border-top:none}.maplibregl-popup-anchor-top-right .maplibregl-popup-tip{align-self:flex-end;border-bottom-color:#fff;border-right:none;border-top:none}.maplibregl-popup-anchor-bottom .maplibregl-popup-tip{align-self:center;border-bottom:none;border-top-color:#fff}.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip{align-self:flex-start;border-bottom:none;border-left:none;border-top-color:#fff}.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip{align-self:flex-end;border-bottom:none;border-right:none;border-top-color:#fff}.maplibregl-popup-anchor-left .maplibregl-popup-tip{align-self:center;border-left:none;border-right-color:#fff}.maplibregl-popup-anchor-right .maplibregl-popup-tip{align-self:center;border-left-color:#fff;border-right:none}.maplibregl-popup-close-button{background-color:transparent;border:0;border-radius:0 3px 0 0;cursor:pointer;position:absolute;right:0;top:0}.maplibregl-popup-close-button:hover{background-color:rgb(0 0 0/5%)}.maplibregl-popup-content{background:#fff;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.1);padding:15px 10px;pointer-events:auto;position:relative}.maplibregl-popup-anchor-top-left .maplibregl-popup-content{border-top-left-radius:0}.maplibregl-popup-anchor-top-right .maplibregl-popup-content{border-top-right-radius:0}.maplibregl-popup-anchor-bottom-left .maplibregl-popup-content{border-bottom-left-radius:0}.maplibregl-popup-anchor-bottom-right .maplibregl-popup-content{border-bottom-right-radius:0}.maplibregl-popup-track-pointer{display:none}.maplibregl-popup-track-pointer *{pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.maplibregl-map:hover .maplibregl-popup-track-pointer{display:flex}.maplibregl-map:active .maplibregl-popup-track-pointer{display:none}.maplibregl-marker{left:0;position:absolute;top:0;transition:opacity .2s;will-change:transform}.maplibregl-user-location-dot,.maplibregl-user-location-dot:before{background-color:#1da1f2;border-radius:50%;height:15px;width:15px}.maplibregl-user-location-dot:before{animation:maplibregl-user-location-dot-pulse 2s infinite;content:"";position:absolute}.maplibregl-user-location-dot:after{border:2px solid #fff;border-radius:50%;box-shadow:0 0 3px rgba(0,0,0,.35);box-sizing:border-box;content:"";height:19px;left:-2px;position:absolute;top:-2px;width:19px}@keyframes maplibregl-user-location-dot-pulse{0%{opacity:1;transform:scale(1)}70%{opacity:0;transform:scale(3)}to{opacity:0;transform:scale(1)}}.maplibregl-user-location-dot-stale{background-color:#aaa}.maplibregl-user-location-dot-stale:after{display:none}.maplibregl-user-location-accuracy-circle{background-color:#1da1f233;border-radius:100%;height:1px;width:1px}.maplibregl-crosshair,.maplibregl-crosshair .maplibregl-interactive,.maplibregl-crosshair .maplibregl-interactive:active{cursor:crosshair}.maplibregl-boxzoom{background:#fff;border:2px dotted #202020;height:0;left:0;opacity:.5;position:absolute;top:0;width:0}.maplibregl-cooperative-gesture-screen{align-items:center;background:rgba(0,0,0,.4);color:#fff;display:flex;font-size:1.4em;inset:0;justify-content:center;line-height:1.2;opacity:0;padding:1rem;pointer-events:none;position:absolute;transition:opacity 1s ease 1s;z-index:99999}.maplibregl-cooperative-gesture-screen.maplibregl-show{opacity:1;transition:opacity .05s}.maplibregl-cooperative-gesture-screen .maplibregl-mobile-message{display:none}@media (hover:none),(width <= 480px){.maplibregl-cooperative-gesture-screen .maplibregl-desktop-message{display:none}.maplibregl-cooperative-gesture-screen .maplibregl-mobile-message{display:block}}.maplibregl-pseudo-fullscreen{height:100%!important;left:0!important;position:fixed!important;top:0!important;width:100%!important;z-index:99999}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 14px; overflow: hidden; }
+#map { position: fixed; inset: 0; }
+.maplibregl-map { font-family: var(--font-body); }
+.maplibregl-ctrl-top-right { right: calc(max(16px, env(safe-area-inset-right, 0px)) + min(384px, 30vw) + 4px); top: 6px; }
+.maplibregl-ctrl-group { background: var(--panel); box-shadow: var(--shadow); }
+.maplibregl-ctrl-group button + button { border-top-color: var(--rule); }
+.maplibregl-ctrl button .maplibregl-ctrl-icon { filter: none; }
+:root[data-theme="dark"] .maplibregl-ctrl button .maplibregl-ctrl-icon { filter: invert(1); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .maplibregl-ctrl button .maplibregl-ctrl-icon { filter: invert(1); } }
+.maplibregl-ctrl-attrib { background: color-mix(in srgb, var(--panel) 80%, transparent) !important; color: var(--muted); }
+.maplibregl-ctrl-attrib a { color: var(--ink-2); }
+
+#ui { position: fixed; inset: 0; pointer-events: none; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px; display: grid; grid-template-columns: minmax(0, 400px) 1fr minmax(0, 384px); grid-template-rows: auto 1fr auto; gap: 12px; }
+#ui > * { pointer-events: auto; }
+
+/* Barra de comando */
+.comando { grid-column: 1; grid-row: 1; background: var(--panel); border-radius: 10px; box-shadow: var(--shadow); display: grid; gap: 10px; padding: 14px 14px 12px; align-self: start; min-width: 0; }
+.marca { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.marca h1 { margin: 0; font-family: var(--font-display); font-stretch: 62%; font-weight: 800; font-size: 25px; line-height: 1; letter-spacing: -0.005em; text-transform: uppercase; text-wrap: balance; }
+.marca h1 span { color: var(--muted); font-weight: 600; }
+.link-sobre { background: none; border: 0; padding: 4px 0; color: var(--ink-2); font: 500 12px/1 var(--font-body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; white-space: nowrap; }
+.link-sobre:hover { color: var(--ink); }
+.sub { margin: -4px 0 0; color: var(--ink-2); font-size: 13px; line-height: 1.35; }
+.busca { position: relative; }
+.busca input { width: 100%; box-sizing: border-box; font: 500 15px/1.2 var(--font-body); color: var(--ink); background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 40px 10px 12px; }
+.busca input::placeholder { color: var(--muted); }
+.busca input:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
+.btn-geo { position: absolute; right: 4px; top: 4px; width: 34px; height: 34px; border: 0; border-radius: 6px; background: transparent; color: var(--ink-2); cursor: pointer; display: grid; place-items: center; }
+.btn-geo:hover { background: var(--rule); color: var(--ink); }
+.resultados { position: absolute; left: 0; right: 0; top: calc(100% + 6px); background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; box-shadow: var(--shadow); max-height: min(60vh, 420px); overflow: auto; z-index: 5; padding: 4px; margin: 0; list-style: none; }
+.resultados li { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.resultados li[aria-selected="true"], .resultados li:hover { background: var(--panel-2); }
+.resultados .tipo { grid-row: span 2; font: 600 10px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 3px; min-width: 52px; }
+.resultados .t1 { font-weight: 600; }
+.resultados .t2 { color: var(--muted); font-size: 12px; }
+.resultados .vazio { display: block; color: var(--muted); cursor: default; }
+.controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px; padding: 2px; }
+.seg button { border: 0; background: transparent; color: var(--ink-2); font: 600 13px/1 var(--font-body); padding: 8px 10px; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.seg button:focus-visible, .link-sobre:focus-visible, .btn-geo:focus-visible, select:focus-visible, .lista button:focus-visible, .migalhas button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+select { font: 600 13px/1 var(--font-body); color: var(--ink); background: var(--panel-2); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 8px; max-width: 100%; }
+
+/* Painel-boletim */
+.painel { grid-column: 3; grid-row: 1 / span 3; background: var(--panel); border-radius: 10px; box-shadow: var(--shadow); display: flex; flex-direction: column; min-height: 0; max-height: 100%; align-self: start; overflow: hidden; }
+.painel-alca { display: none; }
+.migalhas { display: flex; flex-wrap: wrap; gap: 2px 4px; align-items: center; padding: 12px 16px 0; font: 500 12px/1.4 var(--font-mono); color: var(--muted); }
+.migalhas button { background: none; border: 0; padding: 0; color: var(--ink-2); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.migalhas .sep { color: var(--rule); }
+.painel-corpo { overflow-y: auto; padding: 8px 16px 16px; min-height: 0; overscroll-behavior: contain; }
+.bu-cab { font: 600 11px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; padding-top: 6px; }
+.painel h2 { font-family: var(--font-display); font-stretch: 75%; font-weight: 800; font-size: 26px; line-height: 1.05; margin: 6px 0 4px; text-wrap: balance; overflow-wrap: anywhere; }
+.painel .end { color: var(--ink-2); font-size: 13px; line-height: 1.4; margin: 0 0 4px; overflow-wrap: anywhere; }
+.aviso { font-size: 12px; line-height: 1.4; color: var(--ink-2); background: var(--panel-2); border-left: 3px solid var(--muted); padding: 6px 8px; margin: 8px 0; border-radius: 0 4px 4px 0; }
+.serrilha { border: 0; height: 8px; margin: 12px -16px; background: radial-gradient(circle at 4px 0, transparent 3.5px, var(--panel) 4px) 0 0 / 8px 8px repeat-x, linear-gradient(var(--rule), var(--rule)) 0 0 / 100% 1px no-repeat; opacity: .9; }
+.tracejado { border: 0; border-top: 1px dashed var(--rule); margin: 12px 0; }
+.manchete { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; align-items: center; margin: 10px 0 2px; }
+.manchete .chip { width: 12px; height: 34px; border-radius: 3px; grid-row: span 2; }
+.manchete .q { font: 600 11px/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.manchete .r { font-family: var(--font-display); font-stretch: 80%; font-weight: 700; font-size: 18px; line-height: 1.15; }
+.cands { display: grid; gap: 10px; margin: 12px 0 4px; }
+.cand { display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; }
+.cand .nome { font-weight: 600; font-size: 14px; display: flex; gap: 6px; align-items: baseline; min-width: 0; }
+.cand .nome small { font: 500 11px/1 var(--font-mono); color: var(--muted); }
+.cand .num { font: 600 14px/1.2 var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+.cand .barra { grid-column: 1 / -1; position: relative; height: 8px; background: var(--panel-2); border-radius: 2px; }
+.cand .barra i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px 4px 4px 2px; }
+.cand .barra b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); border-radius: 1px; }
+.cand .det { grid-column: 1 / -1; font: 400 11.5px/1.2 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.cand.vence .nome::after { content: "venceu"; font: 600 9.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--panel); background: var(--ink); padding: 3px 5px; border-radius: 3px; margin-left: 2px; align-self: center; }
+.ref { font: 400 11.5px/1.3 var(--font-mono); color: var(--muted); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.ref b { display: inline-block; width: 2px; height: 12px; background: var(--ink); }
+.mais { background: none; border: 0; padding: 4px 0; color: var(--ink-2); font: 500 12px/1 var(--font-body); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.tabela { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font: 400 12.5px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; margin: 4px 0; }
+.tabela dt { color: var(--ink-2); }
+.tabela dd { margin: 0; text-align: right; color: var(--ink); }
+.secao-tit { font: 600 11px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.filtro { width: 100%; box-sizing: border-box; font: 500 13px/1.2 var(--font-body); color: var(--ink); background: var(--panel-2); border: 1px solid var(--rule); border-radius: 6px; padding: 7px 9px; margin-bottom: 6px; }
+.filtro:focus { outline: 2px solid var(--focus); outline-offset: 1px; }
+.lista { list-style: none; margin: 0; padding: 0; display: grid; }
+.lista button { width: 100%; display: grid; grid-template-columns: 10px 1fr auto; gap: 2px 10px; align-items: center; text-align: left; background: none; border: 0; border-top: 1px solid var(--rule); padding: 8px 2px; color: var(--ink); font: inherit; cursor: pointer; }
+.lista button:hover { background: var(--panel-2); }
+.lista .dot { width: 10px; height: 10px; border-radius: 2px; }
+.lista .l1 { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.lista .l2 { grid-column: 2; font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.lista .v { grid-row: 1 / span 2; grid-column: 3; font: 600 12.5px/1 var(--font-mono); font-variant-numeric: tabular-nums; }
+.dica { color: var(--muted); font-size: 12.5px; line-height: 1.45; margin: 8px 0; }
+
+/* Legenda */
+.legenda { grid-column: 1; grid-row: 3; align-self: end; justify-self: start; background: var(--panel); border-radius: 10px; box-shadow: var(--shadow); padding: 10px 12px; max-width: 100%; box-sizing: border-box; }
+.legenda .tit { font: 600 10.5px/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.leg-linha { display: grid; grid-template-columns: 112px auto; align-items: center; gap: 8px; margin: 3px 0; font-size: 12.5px; font-weight: 600; }
+.leg-rampa { display: flex; gap: 2px; }
+.leg-rampa i { width: 26px; height: 12px; border-radius: 1px; }
+.leg-escala { display: grid; grid-template-columns: 112px auto; gap: 8px; }
+.leg-escala div { display: flex; gap: 2px; font: 400 10px/1 var(--font-mono); color: var(--muted); }
+.leg-escala span { width: 26px; text-align: center; }
+.leg-extra { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; font-size: 11.5px; color: var(--ink-2); }
+.leg-extra i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; border: 1px solid var(--rule); }
+
+/* Rótulos e dica flutuante */
+.rotulo { pointer-events: none; font: 600 11px/1 var(--font-body); color: var(--ink); white-space: nowrap; text-shadow: 0 0 2px var(--land), 0 0 3px var(--land), 0 0 5px var(--land); letter-spacing: .02em; }
+.rotulo.uf { font: 800 13px/1 var(--font-display); font-stretch: 75%; letter-spacing: .08em; color: var(--ink-2); }
+.rotulo.mun { font-weight: 700; font-size: 11.5px; }
+.rotulo.bairro { font: 600 10px/1 var(--font-body); text-transform: uppercase; letter-spacing: .07em; color: var(--ink-2); }
+#tip { position: fixed; z-index: 20; pointer-events: none; background: var(--panel); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; box-shadow: var(--shadow); padding: 7px 9px; font-size: 12.5px; line-height: 1.35; max-width: 260px; }
+#tip .tn { font-weight: 700; }
+#tip .tv { font: 500 12px/1.3 var(--font-mono); color: var(--ink-2); }
+.carregando { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--panel); color: var(--ink-2); padding: 10px 14px; border-radius: 8px; box-shadow: var(--shadow); font: 500 13px/1 var(--font-mono); z-index: 30; pointer-events: none; }
+
+/* Sobre */
+.sobre-fundo { position: fixed; inset: 0; background: rgba(10,14,18,.45); z-index: 40; display: grid; place-items: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px; }
+.sobre { background: var(--panel); color: var(--ink); border-radius: 12px; box-shadow: var(--shadow); max-width: 640px; width: 100%; max-height: 100%; overflow: auto; padding: 20px 22px; box-sizing: border-box; }
+.sobre h2 { font-family: var(--font-display); font-stretch: 70%; font-weight: 800; font-size: 26px; margin: 0 0 8px; text-transform: uppercase; }
+.sobre h3 { font: 600 11px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+.sobre p, .sobre li { line-height: 1.55; font-size: 14px; max-width: 65ch; color: var(--ink-2); }
+.sobre ul { padding-left: 18px; margin: 0; }
+.sobre a { color: var(--ink); }
+.sobre .fechar { float: right; border: 1px solid var(--rule); background: var(--panel-2); color: var(--ink); border-radius: 6px; padding: 6px 10px; font: 600 13px/1 var(--font-body); cursor: pointer; }
+
+/* Celular: gaveta inferior */
+@media (max-width: 760px) {
+  #ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr auto; padding-block: 10px 0; gap: 8px; }
+  .comando { padding: 10px 12px; gap: 8px; }
+  .marca h1 { font-size: 21px; }
+  .sub { display: none; }
+  .legenda { grid-row: 2; align-self: end; padding: 8px 10px; margin-bottom: 4px; }
+  .leg-linha, .leg-escala { grid-template-columns: 92px auto; }
+  .leg-rampa i, .leg-escala span { width: 20px; }
+  .painel { grid-column: 1; grid-row: 3; border-radius: 12px 12px 0 0; max-height: 46vh; margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); padding-bottom: env(safe-area-inset-bottom, 0px); transition: max-height .2s ease; }
+  .painel.recolhido { max-height: 132px; }
+  .painel.recolhido .legenda-oculta { display: none; }
+  .painel-alca { display: block; width: 100%; border: 0; background: none; padding: 8px 0 0; cursor: pointer; }
+  .painel-alca span { display: block; width: 40px; height: 4px; border-radius: 2px; background: var(--rule); margin: 0 auto; }
+  .migalhas, .painel-corpo { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .painel h2 { font-size: 22px; }
+  .maplibregl-ctrl-top-right { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .painel { transition: none; } }
+</style>
+
+</head>
+<body>
+<div id="map" aria-label="Mapa dos locais de votação"></div>
+<div id="ui">
+  <section class="comando" aria-label="Busca e filtros">
+    <div class="marca">
+      <h1>Vizinhança Eleitoral <span>2026</span></h1>
+      <button class="link-sobre" id="abrirSobre" type="button">Como foi feito</button>
+    </div>
+    <p class="sub">Quem venceu a eleição para presidente em cada local de votação do Brasil.</p>
+    <div class="busca" role="combobox" aria-haspopup="listbox" aria-owns="resultados" aria-expanded="false" id="buscaBox">
+      <input id="busca" type="search" autocomplete="off" spellcheck="false" placeholder="Cidade, bairro, escola ou CEP" aria-label="Buscar cidade, bairro, local de votação ou CEP" aria-controls="resultados">
+      <button class="btn-geo" id="btnGeo" type="button" title="Usar minha localização" aria-label="Usar minha localização">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
+      <ul class="resultados" id="resultados" role="listbox" hidden></ul>
+    </div>
+    <div class="controles">
+      <div class="seg" role="group" aria-label="Turno">
+        <button type="button" data-turno="1" aria-pressed="false">1º turno</button>
+        <button type="button" data-turno="2" aria-pressed="true">2º turno</button>
+      </div>
+      <div class="seg" role="group" aria-label="Modo do mapa">
+        <button type="button" data-modo="vencedor" aria-pressed="true">Vencedor</button>
+        <button type="button" data-modo="cand" aria-pressed="false">Candidato</button>
+      </div>
+      <select id="selCand" aria-label="Candidato" hidden></select>
+    </div>
+  </section>
+  <aside class="painel" id="painel" aria-live="polite">
+    <button class="painel-alca" id="alca" type="button" aria-label="Expandir ou recolher painel"><span></span></button>
+    <nav class="migalhas" id="migalhas" aria-label="Navegação"></nav>
+    <div class="painel-corpo" id="corpo"></div>
+  </aside>
+  <div class="legenda" id="legenda"></div>
+</div>
+<div id="tip" hidden></div>
+<div class="carregando" id="carregando">Carregando dados do TSE…</div>
+<div class="sobre-fundo" id="sobreFundo" hidden>
+  <div class="sobre" role="dialog" aria-modal="true" aria-labelledby="sobreTit">
+    <button class="fechar" id="fecharSobre" type="button">Fechar</button>
+    <h2 id="sobreTit">Como foi feito</h2>
+    <p>O mapa divide cada município em áreas de influência dos locais de votação. Cada área reúne os pontos mais próximos de um local do que de qualquer outro (um diagrama de Voronoi), recortada pela fronteira do município. A cor mostra quem venceu naquele local, e a intensidade mostra a fatia de votos válidos do vencedor.</p>
+    <h3>O que a área significa</h3>
+    <p>A área é uma aproximação da vizinhança atendida por cada escola ou prédio de votação. O eleitor vota onde fez o título, que nem sempre é perto de casa. Em zonas rurais e em municípios grandes, as áreas ficam extensas e cobrem lugares sem moradores.</p>
+    <h3>Dados</h3>
+    <ul>
+      <li>Votos por seção eleitoral para presidente, 1º e 2º turnos (TSE, arquivo gerado em 26/10/2026).</li>
+      <li>Detalhe da apuração por seção: eleitores aptos e comparecimento (TSE, 26/10/2026).</li>
+      <li>Eleitorado por local de votação, com endereço, bairro, CEP e coordenadas (TSE, 25/10/2026).</li>
+      <li>Malha municipal do IBGE, resolução máxima, simplificada para a web.</li>
+    </ul>
+    <h3>Tratamentos</h3>
+    <ul>
+      <li>Votos e locais foram casados pela seção eleitoral. Locais provisórios aparecem no cadastro com número novo, e a seção resolve a diferença.</li>
+      <li id="sobreNumeros">Locais com coordenada ausente ou fora do município foram posicionados pela média dos outros locais com o mesmo CEP. Os que não puderam ser posicionados aparecem só na lista do município.</li>
+      <li>Locais no mesmo endereço formam uma única área, com o resultado somado.</li>
+      <li>Boa Esperança do Norte (MT) ainda não tem polígono na malha do IBGE. Suas áreas foram calculadas junto com Nova Ubiratã, de onde o município foi desmembrado.</li>
+      <li>Votos do exterior entram nos totais do Brasil, mas não no mapa.</li>
+      <li>Leonardo Araújo aparece no arquivo de votos por seção, mas não no arquivo consolidado de candidatos do TSE. Seus votos são mostrados como registrados por seção.</li>
+      <li>Percentuais de candidatos são sobre votos válidos, sem brancos e nulos. Comparecimento e abstenção são sobre eleitores aptos.</li>
+    </ul>
+    <h3>Referência</h3>
+    <p>Inspirado nos mapas de vizinhanças do Estadão (2018) e na ferramenta “Como votou minha vizinhança” (2026). Este mapa é independente e foi refeito do zero com dados públicos.</p>
+    <p id="sobreAmbiente"></p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const nf = new Intl.NumberFormat('pt-BR');
+const fmt = n => nf.format(n);
+const pct = (x, d = 1) => (x * 100).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = s => String(s || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+const titulo = s => String(s || '').toLowerCase().replace(/(^|[\s\-\/(.])([a-zà-ú])/g, (m, a, b) => a + b.toUpperCase())
+  .replace(/\b(De|Da|Do|Das|Dos|E|Em|Na|No)\b/g, w => w.toLowerCase());
+const fmtCep = c => c && c.length === 8 ? c.slice(0, 5) + '-' + c.slice(5) : (c || '');
+
+// Ambiente: dentro do Artifact (CSP fechada) não há mapa-base nem geocodificação externa.
+const EXTERNO = !/[?&]offline/.test(location.search) && !window.claude && !/claude|anthropic/i.test(location.hostname) && /^https?:$/.test(location.protocol);
+
+const CAND = {
+  13: ['Lula', 'PT'], 22: ['Flávio Bolsonaro', 'PL'], 70: ['Augusto Cury', 'Avante'], 14: ['Renan Santos', 'Missão'],
+  55: ['Ronaldo Caiado', 'PSD'], 30: ['Romeu Zema', 'Novo'], 80: ['Samara Martins', 'UP'], 16: ['Hertz Dias', 'PSTU'],
+  27: ['Clariana Barão', 'DC'], 21: ['Edmilson Costa', 'PCB'], 35: ['Wilson Grassi', 'Democrata'], 29: ['Rui Costa Pimenta', 'PCO'],
+  28: ['Leonardo Araújo', '—'], 95: ['Brancos', ''], 96: ['Nulos', '']
+};
+const nomeC = nr => (CAND[nr] || [String(nr)])[0];
+const BINS_V = { 1: [0.45, 0.55, 0.65, 0.75], 2: [0.55, 0.6, 0.7, 0.8] };
+const LBL_V = { 1: ['<45', '45', '55', '65', '75+'], 2: ['<55', '55', '60', '70', '80+'] };
+const ALF_V = [0.26, 0.44, 0.62, 0.8, 0.97];
+const ALF_C = [0.1, 0.26, 0.42, 0.6, 0.78, 0.96];
+
+const ST = { turno: 2, modo: 'vencedor', cand: 13, uf: null, muni: null, cel: null, nivel: 'br' };
+let BR, MAPA, CANDS, IDX, COR = {}, map, CEP = null;
+const UFC = {};            // cache por UF
+const GEO = {};            // resultado agregado por geometria municipal
+const MUNI_FEAT = {};      // feição por código IBGE de geometria
+const UF_FEAT = {};        // feição por código IBGE da UF
+const UFCOD = {}, UFSIG = {};
+let MUNI_LIST = [];        // para busca
+const NAC = {};            // participação nacional por candidato e turno
+
+// ---------- cores ----------
+function lerCores() {
+  const cs = getComputedStyle(document.documentElement);
+  for (const k of ['bg', 'land', 'ink', 'ink-2', 'muted', 'panel', 'rule', 'cell-line', 'muni-line', 'uf-line', 'c-13', 'c-22', 'c-55', 'c-70', 'c-outros', 'empate'])
+    COR[k] = cs.getPropertyValue('--' + k).trim();
+}
+const hex2rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+const mix = (a, b, t) => { const A = hex2rgb(a), B = hex2rgb(b); return '#' + A.map((v, i) => Math.round(v * t + B[i] * (1 - t)).toString(16).padStart(2, '0')).join(''); };
+const corCand = nr => COR['c-' + nr] || COR['c-outros'];
+const corModoCand = nr => COR['c-' + nr] || COR['c-70'];
+
+// ---------- resultados ----------
+function soma(a, b) { if (!b) return a; if (!a) return b.slice(); return a.map((x, i) => x + b[i]); }
+function somaP(a, b) { if (!b) return a; if (!a) return b.slice(); return a.map((x, i) => x + b[i]); }
+function resumo(v, p, t) {
+  if (!v) return null;
+  const n = v.length; let validos = 0, w = -1, wv = -1, seg = -1, tie = false;
+  for (let i = 0; i < n - 2; i++) {
+    validos += v[i];
+    if (v[i] > wv) { seg = wv; wv = v[i]; w = i; tie = false; } else if (v[i] === wv) { tie = true; } else if (v[i] > seg) seg = v[i];
+  }
+  return { v, t, validos, brancos: v[n - 2], nulos: v[n - 1], w, tie: tie && wv > 0, wShare: validos ? wv / validos : 0, aptos: p ? p[0] : null, comp: p ? p[1] : null, secoes: p ? p[2] : null };
+}
+function corRes(r) {
+  const t = ST.turno;
+  if (!r || !r.validos) return COR.land;
+  if (ST.modo === 'vencedor') {
+    if (r.tie) return COR.empate;
+    const nr = CANDS[t][r.w][0];
+    let k = BINS_V[t].findIndex(b => r.wShare < b); if (k < 0) k = 4;
+    return mix(corCand(nr), COR.land, ALF_V[k]);
+  }
+  const i = IDX[t][ST.cand]; if (i == null) return COR.land;
+  const s = r.v[i] / r.validos, bins = binsCand(ST.cand);
+  let k = bins.findIndex(b => s < b); if (k < 0) k = 5;
+  return mix(corModoCand(ST.cand), COR.land, ALF_C[k]);
+}
+function binsCand(nr) { return (NAC[ST.turno][nr] || 0) > 0.15 ? [0.3, 0.4, 0.5, 0.6, 0.7] : [0.01, 0.02, 0.05, 0.1, 0.2]; }
+
+// ---------- dados ----------
+async function getJSON(u) { const r = await fetch(u); if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); }
+const carregando = (on, txt) => { const el = $('#carregando'); if (txt) el.textContent = txt; el.hidden = !on; };
+
+async function carregarUF(uf) {
+  if (UFC[uf]) return UFC[uf];
+  carregando(true, `Carregando locais de ${uf}…`);
+  try {
+    const [d, topo] = await Promise.all([getJSON(`data/dados_${uf}.json`), getJSON(`data/celulas_${uf}.json`)]);
+    const fc = topojson.feature(topo, topo.objects.celulas);
+    const cel = new Map();
+    d.locais.forEach((l, i) => {
+      if (l[7] < 0) return;
+      let c = cel.get(l[7]); if (!c) { c = { ids: [], v1: null, v2: null, p1: null, p2: null }; cel.set(l[7], c); }
+      c.ids.push(i); c.v1 = soma(c.v1, l[10]); c.p1 = somaP(c.p1, l[11]); c.v2 = soma(c.v2, l[12]); c.p2 = somaP(c.p2, l[13]);
+    });
+    const muniIdx = {}; d.munis.forEach((m, i) => { muniIdx[m.ibge] = i; m.locais = []; });
+    d.locais.forEach((l, i) => d.munis[l[0]].locais.push(i));
+    // bairros: centro ponderado pelos eleitores
+    const bairros = new Map();
+    d.locais.forEach(l => {
+      if (!l[9] || !l[5] || l[8] !== 0) return;
+      const k = l[0] + '|' + norm(l[5]); const w = (l[13] || l[11] || [1])[0] || 1;
+      let b = bairros.get(k); if (!b) { b = { nome: l[5], m: l[0], x: 0, y: 0, w: 0, n: 0 }; bairros.set(k, b); }
+      b.x += l[9][0] * w; b.y += l[9][1] * w; b.w += w; b.n++;
+    });
+    const bl = [...bairros.values()].map(b => ({ nome: b.nome, m: b.m, xy: [b.x / b.w, b.y / b.w], w: b.w, n: b.n })).sort((a, b) => b.w - a.w);
+    const pontos = { type: 'FeatureCollection', features: d.locais.filter(l => l[9]).map(l => ({ type: 'Feature', properties: { f: l[8] }, geometry: { type: 'Point', coordinates: l[9] } })) };
+    UFC[uf] = { uf, d, fc, cel, muniIdx, bairros: bl, pontos };
+    return UFC[uf];
+  } finally { carregando(false); }
+}
+
+async function ativarUF(uf) {
+  const u = await carregarUF(uf);
+  if (ST.uf !== uf) {
+    ST.uf = uf;
+    map.getSource('celulas').setData(u.fc);
+    map.getSource('pontos').setData(u.pontos);
+    map.setFilter('munis-fill', ['!=', ['get', 'uf'], UFCOD[uf]]);
+    pintarCelulas();
+  }
+  return u;
+}
+
+// ---------- pintura ----------
+function pintarMunis() {
+  for (const g in GEO) map.setFeatureState({ source: 'munis', id: g }, { cor: corRes(resumo(GEO[g]['v' + ST.turno], null, ST.turno)) });
+}
+function pintarCelulas() {
+  const u = UFC[ST.uf]; if (!u) return;
+  const t = ST.turno;
+  for (const [c, o] of u.cel) map.setFeatureState({ source: 'celulas', id: c }, { cor: corRes(resumo(o['v' + t], o['p' + t], t)) });
+}
+function pintar() { pintarMunis(); pintarCelulas(); legenda(); }
+
+// ---------- mapa ----------
+function bboxGeom(g) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const walk = a => { if (typeof a[0] === 'number') { if (a[0] < x0) x0 = a[0]; if (a[0] > x1) x1 = a[0]; if (a[1] < y0) y0 = a[1]; if (a[1] > y1) y1 = a[1]; } else a.forEach(walk); };
+  walk(g.coordinates); return [[x0, y0], [x1, y1]];
+}
+function centroide(g) {
+  // centro do maior anel (média ponderada por área)
+  const polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+  let best = null, bestA = -1;
+  for (const p of polys) {
+    const r = p[0]; let a = 0, cx = 0, cy = 0;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const f = r[j][0] * r[i][1] - r[i][0] * r[j][1]; a += f; cx += (r[j][0] + r[i][0]) * f; cy += (r[j][1] + r[i][1]) * f; }
+    if (Math.abs(a) > bestA) { bestA = Math.abs(a); best = a ? [cx / (3 * a), cy / (3 * a)] : r[0]; }
+  }
+  return best;
+}
+function dentro(pt, g) {
+  const polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+  const [x, y] = pt;
+  for (const p of polys) {
+    let ins = false;
+    for (const r of p) for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      if ((r[i][1] > y) !== (r[j][1] > y) && x < (r[j][0] - r[i][0]) * (y - r[i][1]) / (r[j][1] - r[i][1]) + r[i][0]) ins = !ins;
+    }
+    if (ins) return true;
+  }
+  return false;
+}
+function padding() {
+  const w = innerWidth;
+  if (w <= 760) return { top: 150, bottom: Math.round(innerHeight * 0.48), left: 24, right: 24 };
+  return { top: 40, bottom: 40, left: Math.min(440, w * 0.3), right: Math.min(420, w * 0.3) };
+}
+
+// Mapa de ruas (só fora do Claude): OpenFreeMap, gratuito e sem chave. Ruas e água ficam por baixo das áreas;
+// nomes de ruas e rios ficam por cima. Se o serviço não responder em 5 s, o mapa segue sem ruas.
+async function estiloRuas() {
+  const esc = matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.dataset.theme !== 'light' || document.documentElement.dataset.theme === 'dark';
+  try {
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 5000);
+    const r = await fetch(`https://tiles.openfreemap.org/styles/${esc ? 'dark' : 'positron'}`, { signal: ctl.signal }); clearTimeout(t);
+    if (!r.ok) throw new Error(r.status);
+    const st = await r.json();
+    const fonte = Object.keys(st.sources).find(k => st.sources[k].type === 'vector');
+    const da = l => l.source === fonte;
+    const below = st.layers.filter(l => da(l) && (l.type === 'fill' || l.type === 'line') && ['water', 'waterway', 'transportation'].includes(l['source-layer']));
+    const above = st.layers.filter(l => da(l) && l.type === 'symbol' && ['transportation_name', 'water_name', 'waterway'].includes(l['source-layer']) && !(l.layout || {})['icon-image']);
+    return { glyphs: st.glyphs, fonte, src: st.sources[fonte], below, above };
+  } catch (e) { return null; }
+}
+
+function montarMapa(ruas) {
+  const munis = topojson.feature(MAPA, MAPA.objects.municipios);
+  munis.features.forEach(f => { f.id = f.properties.codarea; MUNI_FEAT[f.properties.codarea] = f; });
+  const estados = topojson.feature(MAPA, MAPA.objects.estados);
+  estados.features.forEach(f => { UF_FEAT[f.properties.uf] = f; });
+  const style = { version: 8, sources: {}, layers: [{ id: 'bg', type: 'background', paint: { 'background-color': COR.bg } }] };
+  if (ruas) { style.glyphs = ruas.glyphs; style.sources[ruas.fonte] = ruas.src; style.layers.push(...ruas.below); }
+  map = new maplibregl.Map({
+    container: 'map', style, bounds: [[-74, -34], [-34.5, 5.5]], fitBoundsOptions: { padding: padding() },
+    maxBounds: [[-100, -45], [-15, 15]], dragRotate: false, pitchWithRotate: false, attributionControl: false, minZoom: 2.5, maxZoom: 17
+  });
+  map.touchZoomRotate.disableRotation();
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+  map.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: 'Dados: TSE, IBGE' }), 'bottom-right');
+  map.on('load', () => {
+    const op = ruas ? 0.78 : 1;
+    map.addSource('munis', { type: 'geojson', data: munis, promoteId: 'codarea', tolerance: 0.2 });
+    map.addSource('estados', { type: 'geojson', data: estados, tolerance: 0.3 });
+    map.addSource('celulas', { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, promoteId: 'c', tolerance: 0.25 });
+    map.addSource('pontos', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+    map.addLayer({ id: 'munis-fill', type: 'fill', source: 'munis', paint: { 'fill-color': ['coalesce', ['feature-state', 'cor'], COR.land], 'fill-opacity': op } });
+    map.addLayer({ id: 'cel-fill', type: 'fill', source: 'celulas', paint: { 'fill-color': ['coalesce', ['feature-state', 'cor'], COR.land], 'fill-opacity': ['interpolate', ['linear'], ['zoom'], 12, op, 15, ruas ? 0.6 : 1] } });
+    map.addLayer({ id: 'cel-line', type: 'line', source: 'celulas', paint: { 'line-color': COR['cell-line'], 'line-width': ['interpolate', ['linear'], ['zoom'], 8, 0, 10, 0.4, 14, 1.2], 'line-opacity': 0.9 } });
+    map.addLayer({ id: 'munis-line', type: 'line', source: 'munis', paint: { 'line-color': COR['muni-line'], 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.08, 6, 0.35, 9, 0.9, 13, 1.6], 'line-opacity': ['interpolate', ['linear'], ['zoom'], 3, 0.35, 8, 0.7] } });
+    map.addLayer({ id: 'estados-line', type: 'line', source: 'estados', paint: { 'line-color': COR['uf-line'], 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.7, 8, 1.6, 12, 2.4] } });
+    map.addLayer({ id: 'pontos', type: 'circle', source: 'pontos', minzoom: 11, paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 1.4, 15, 4], 'circle-color': ['case', ['==', ['get', 'f'], 0], COR.ink, COR.panel], 'circle-stroke-color': ['case', ['==', ['get', 'f'], 0], COR.panel, COR.ink], 'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 11, 0.5, 15, 1.2] } });
+    map.addLayer({ id: 'muni-sel', type: 'line', source: 'munis', filter: ['==', ['get', 'codarea'], ''], paint: { 'line-color': COR.ink, 'line-width': ['interpolate', ['linear'], ['zoom'], 5, 1.5, 12, 3] } });
+    map.addLayer({ id: 'cel-hover', type: 'line', source: 'celulas', filter: ['==', ['get', 'c'], -1], paint: { 'line-color': COR.ink, 'line-width': 1, 'line-opacity': 0.45 } });
+    map.addLayer({ id: 'cel-sel', type: 'line', source: 'celulas', filter: ['==', ['get', 'c'], -1], paint: { 'line-color': COR.ink, 'line-width': 3 } });
+    if (ruas) ruas.above.forEach(l => map.addLayer(l));
+    pintar();
+    eventosMapa();
+    rotulos();
+    map.on('moveend', rotulos);
+    carregando(false);
+    abrirHash();
+  });
+}
+
+function aplicarTema() {
+  lerCores();
+  if (!map || !map.getLayer('bg')) return;
+  map.setPaintProperty('bg', 'background-color', COR.bg);
+  map.setPaintProperty('cel-line', 'line-color', COR['cell-line']);
+  map.setPaintProperty('munis-line', 'line-color', COR['muni-line']);
+  map.setPaintProperty('estados-line', 'line-color', COR['uf-line']);
+  for (const id of ['muni-sel', 'cel-hover', 'cel-sel']) map.setPaintProperty(id, 'line-color', COR.ink);
+  map.setPaintProperty('pontos', 'circle-color', ['case', ['==', ['get', 'f'], 0], COR.ink, COR.panel]);
+  map.setPaintProperty('pontos', 'circle-stroke-color', ['case', ['==', ['get', 'f'], 0], COR.panel, COR.ink]);
+  map.setPaintProperty('munis-fill', 'fill-color', ['coalesce', ['feature-state', 'cor'], COR.land]);
+  map.setPaintProperty('cel-fill', 'fill-color', ['coalesce', ['feature-state', 'cor'], COR.land]);
+  pintar(); render();
+}
+
+// ---------- rótulos (sem fontes vetoriais: marcadores HTML com anti-colisão) ----------
+let marcadores = [];
+function rotulos() {
+  marcadores.forEach(m => m.remove()); marcadores = [];
+  const z = map.getZoom(), b = map.getBounds(), W = innerWidth, H = innerHeight;
+  const ocup = [];
+  const cabe = (p, w, h) => {
+    const r = [p.x - w / 2 - 4, p.y - h / 2 - 3, p.x + w / 2 + 4, p.y + h / 2 + 3];
+    if (r[0] < 0 || r[1] < 0 || r[2] > W || r[3] > H) return false;
+    for (const o of ocup) if (!(r[2] < o[0] || r[0] > o[2] || r[3] < o[1] || r[1] > o[3])) return false;
+    ocup.push(r); return true;
+  };
+  const add = (xy, txt, cls, px) => {
+    const p = map.project(xy); const w = txt.length * px, h = px * 1.9;
+    if (!cabe(p, w, h)) return false;
+    const el = document.createElement('div'); el.className = 'rotulo ' + cls; el.textContent = txt;
+    marcadores.push(new maplibregl.Marker({ element: el }).setLngLat(xy).addTo(map)); return true;
+  };
+  if (z < 5.2) {
+    for (const cod in UF_FEAT) { const c = UF_FEAT[cod].__c || (UF_FEAT[cod].__c = centroide(UF_FEAT[cod].geometry)); add(c, UFSIG[cod], 'uf', 9); }
+    return;
+  }
+  if (z < 11.5) {
+    const lim = z < 7 ? 25 : 45; let n = 0;
+    for (const m of MUNI_LIST) {
+      if (n >= lim) break;
+      const f = MUNI_FEAT[m.g]; if (!f) continue;
+      const c = f.__c || (f.__c = centroide(f.geometry));
+      if (!b.contains(c)) continue;
+      if (z < 7 && m.aptos < 150000) break;
+      if (add(c, m.n, 'mun', 6.6)) n++;
+    }
+  }
+  const u = UFC[ST.uf];
+  if (u && z >= 11.5) {
+    let n = 0;
+    for (const bb of u.bairros) {
+      if (n >= 55) break;
+      if (!b.contains(bb.xy)) continue;
+      if (add(bb.xy, bb.nome.toUpperCase(), 'bairro', 7.2)) n++;
+    }
+  }
+}
+
+// ---------- interação com o mapa ----------
+const ehToque = matchMedia('(hover: none)').matches;
+function eventosMapa() {
+  const tip = $('#tip');
+  let hoverC = -1;
+  map.on('mousemove', e => {
+    if (ehToque) return;
+    const f = map.queryRenderedFeatures(e.point, { layers: ['cel-fill', 'munis-fill'] })[0];
+    if (!f) { tip.hidden = true; map.getCanvas().style.cursor = ''; if (hoverC !== -1) { hoverC = -1; map.setFilter('cel-hover', ['==', ['get', 'c'], -1]); } return; }
+    map.getCanvas().style.cursor = 'pointer';
+    let html = '';
+    if (f.layer.id === 'cel-fill') {
+      const c = f.properties.c, o = UFC[ST.uf].cel.get(c);
+      if (c !== hoverC) { hoverC = c; map.setFilter('cel-hover', ['==', ['get', 'c'], c]); }
+      if (!o) { tip.hidden = true; return; }
+      const l0 = UFC[ST.uf].d.locais[o.ids[0]];
+      const r = resumo(o['v' + ST.turno], o['p' + ST.turno], ST.turno);
+      html = `<div class="tn">${esc(titulo(l0[3]))}${o.ids.length > 1 ? ` <span class="tv">+${o.ids.length - 1}</span>` : ''}</div><div class="tv">${esc(titulo(l0[5]))}</div>${linhaTip(r)}`;
+    } else {
+      if (hoverC !== -1) { hoverC = -1; map.setFilter('cel-hover', ['==', ['get', 'c'], -1]); }
+      const g = f.properties.codarea, G = GEO[g];
+      html = `<div class="tn">${esc(G.nome)} <span class="tv">${esc(G.uf)}</span></div>${linhaTip(resumo(G['v' + ST.turno], G['p' + ST.turno], ST.turno))}`;
+    }
+    tip.innerHTML = html; tip.hidden = false;
+    const x = e.originalEvent.clientX, y = e.originalEvent.clientY, tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.min(x + 14, innerWidth - tw - 8) + 'px'; tip.style.top = Math.min(y + 14, innerHeight - th - 8) + 'px';
+  });
+  map.getCanvas().addEventListener('mouseleave', () => { tip.hidden = true; });
+  map.on('click', e => {
+    const f = map.queryRenderedFeatures(e.point, { layers: ['cel-fill', 'munis-fill'] })[0];
+    if (!f) return;
+    if (f.layer.id === 'cel-fill') selecionarCelula(f.properties.c, false);
+    else { const ibs = GEO[f.properties.codarea].ibges; selecionarMuni(ibs[0]); }
+  });
+}
+function linhaTip(r) {
+  const t = ST.turno;
+  if (!r || !r.validos) return '<div class="tv">Sem votação neste turno</div>';
+  if (ST.modo === 'cand') { const i = IDX[t][ST.cand]; return `<div class="tv">${esc(nomeC(ST.cand))}: ${pct(r.v[i] / r.validos)}</div>`; }
+  if (r.tie) return '<div class="tv">Empate</div>';
+  return `<div class="tv">${esc(nomeC(CANDS[t][r.w][0]))} ${pct(r.wShare)}</div>`;
+}
+
+// ---------- navegação ----------
+function irPara(bounds, maxZoom = 14) { map.fitBounds(bounds, { padding: padding(), maxZoom, duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900 }); }
+function selecionarBrasil() {
+  Object.assign(ST, { nivel: 'br', muni: null, cel: null });
+  map.setFilter('muni-sel', ['==', ['get', 'codarea'], '']); map.setFilter('cel-sel', ['==', ['get', 'c'], -1]);
+  irPara([[-74, -34], [-34.5, 5.5]]); render();
+}
+async function selecionarUF(uf) {
+  Object.assign(ST, { nivel: 'uf', muni: null, cel: null });
+  map.setFilter('muni-sel', ['==', ['get', 'codarea'], '']); map.setFilter('cel-sel', ['==', ['get', 'c'], -1]);
+  irPara(bboxGeom(UF_FEAT[UFCOD[uf]].geometry), 9); render();
+  await ativarUF(uf); render();
+}
+async function selecionarMuni(ibge, voar = true) {
+  const m = BR.munis[ibge]; if (!m) return;
+  Object.assign(ST, { nivel: 'muni', muni: ibge, cel: null });
+  map.setFilter('muni-sel', ['==', ['get', 'codarea'], m.g]); map.setFilter('cel-sel', ['==', ['get', 'c'], -1]);
+  if (voar && MUNI_FEAT[m.g]) irPara(bboxGeom(MUNI_FEAT[m.g].geometry), 13);
+  render();
+  await ativarUF(m.uf); render();
+  try { history.replaceState(null, '', '#' + ibge); } catch (e) {}
+}
+async function selecionarCelula(c, voar = true) {
+  const u = UFC[ST.uf]; const o = u && u.cel.get(c); if (!o) return;
+  const l0 = u.d.locais[o.ids[0]]; const mun = u.d.munis[l0[0]];
+  Object.assign(ST, { nivel: 'cel', muni: mun.ibge, cel: c });
+  map.setFilter('muni-sel', ['==', ['get', 'codarea'], mun.g]);
+  map.setFilter('cel-sel', ['==', ['get', 'c'], c]);
+  if (voar) {
+    const f = u.fc.features.find(f => f.properties.c === c);
+    if (f) irPara(bboxGeom(f.geometry), 15);
+  }
+  expandirPainel(); render();
+}
+async function irParaPonto(xy, ibge) {
+  const m = BR.munis[ibge]; if (!m) return;
+  const u = await ativarUF(m.uf);
+  // célula do local mais próximo no mesmo município (equivale à célula de Voronoi que contém o ponto)
+  const mi = u.muniIdx[ibge]; let best = -1, bd = Infinity;
+  for (const i of u.d.munis[mi].locais) { const l = u.d.locais[i]; if (!l[9] || l[7] < 0) continue; const dx = (l[9][0] - xy[0]) * Math.cos(xy[1] * Math.PI / 180), dy = l[9][1] - xy[1]; const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = l[7]; } }
+  if (best >= 0) { map.flyTo({ center: xy, zoom: 13.6, padding: padding(), duration: 900 }); selecionarCelula(best, false); }
+  else selecionarMuni(ibge);
+}
+function abrirHash() {
+  const h = (location.hash || '').slice(1);
+  if (/^\d{7}$/.test(h) && BR.munis[h]) selecionarMuni(h);
+}
+
+// ---------- painel ----------
+function expandirPainel() { $('#painel').classList.remove('recolhido'); }
+function migalhas() {
+  const p = [];
+  p.push(ST.nivel === 'br' ? '<span>Brasil</span>' : '<button type="button" data-ir="br">Brasil</button>');
+  const uf = ST.nivel === 'uf' ? ST.uf : (ST.muni ? BR.munis[ST.muni].uf : null);
+  if (uf) p.push('<span class="sep">/</span>', ST.nivel === 'uf' ? `<span>${uf}</span>` : `<button type="button" data-ir="uf" data-uf="${uf}">${uf}</button>`);
+  if (ST.muni) p.push('<span class="sep">/</span>', ST.nivel === 'muni' ? `<span>${esc(BR.munis[ST.muni].n)}</span>` : `<button type="button" data-ir="muni">${esc(BR.munis[ST.muni].n)}</button>`);
+  if (ST.nivel === 'cel') p.push('<span class="sep">/</span><span>local</span>');
+  $('#migalhas').innerHTML = p.join(' ');
+}
+function blocoResultado(r, ref, refNome) {
+  const t = ST.turno;
+  if (!r || !r.v) return '<p class="dica">Não houve votação neste local no ' + t + 'º turno. Troque o turno no alto da tela.</p>';
+  const n = r.v.length - 2;
+  const ordem = [...Array(n).keys()].sort((a, b) => r.v[b] - r.v[a]);
+  const vis = t === 2 ? ordem : ordem.slice(0, 5);
+  const linhas = (lst) => lst.map(i => {
+    const nr = CANDS[t][i][0], s = r.validos ? r.v[i] / r.validos : 0;
+    const rs = ref && ref.validos ? ref.v[i] / ref.validos : null;
+    const cor = corCand(nr);
+    return `<div class="cand${i === r.w && !r.tie && r.validos ? ' vence' : ''}"><div class="nome"><span>${esc(nomeC(nr))}</span><small>${nr} · ${esc(CAND[nr]?.[1] || '')}</small></div><div class="num">${pct(s)}</div>
+      <div class="barra"><i style="width:${(s * 100).toFixed(2)}%;background:${cor}"></i>${rs != null ? `<b style="left:calc(${(rs * 100).toFixed(2)}% - 1px)" title="${esc(refNome)}: ${pct(rs)}"></b>` : ''}</div>
+      <div class="det">${fmt(r.v[i])} votos${rs != null ? ` · ${esc(refNome)} ${pct(rs)}` : ''}</div></div>`;
+  }).join('');
+  let h = `<div class="cands">${linhas(vis)}</div>`;
+  if (vis.length < n) h += `<div id="maisCands" hidden><div class="cands">${linhas(ordem.slice(5).filter(i => r.v[i] > 0 || true))}</div></div><button class="mais" type="button" data-mais>Ver os ${n} candidatos</button>`;
+  if (ref) h += `<div class="ref"><b></b> marca o resultado de ${esc(refNome)}</div>`;
+  const total = r.validos + r.brancos + r.nulos;
+  h += '<hr class="tracejado"><dl class="tabela">';
+  h += `<dt>Votos válidos</dt><dd>${fmt(r.validos)}</dd><dt>Brancos</dt><dd>${fmt(r.brancos)} · ${pct(total ? r.brancos / total : 0)}</dd><dt>Nulos</dt><dd>${fmt(r.nulos)} · ${pct(total ? r.nulos / total : 0)}</dd>`;
+  if (r.aptos) h += `<dt>Eleitores aptos</dt><dd>${fmt(r.aptos)}</dd><dt>Comparecimento</dt><dd>${fmt(r.comp)} · ${pct(r.comp / r.aptos)}</dd><dt>Abstenção</dt><dd>${fmt(r.aptos - r.comp)} · ${pct(1 - r.comp / r.aptos)}</dd>`;
+  if (r.secoes) h += `<dt>Seções</dt><dd>${fmt(r.secoes)}</dd>`;
+  return h + '</dl>';
+}
+function manchete(r, onde) {
+  const t = ST.turno;
+  if (!r || !r.validos) return '';
+  if (r.tie) return `<div class="manchete"><span class="chip" style="background:${COR.empate}"></span><span class="q">${t}º turno ${esc(onde)}</span><span class="r">Empate</span></div>`;
+  const nr = CANDS[t][r.w][0];
+  let seg = -1; for (let i = 0; i < r.v.length - 2; i++) if (i !== r.w && (seg < 0 || r.v[i] > r.v[seg])) seg = i;
+  const margem = r.validos ? (r.v[r.w] - r.v[seg]) / r.validos : 0;
+  return `<div class="manchete"><span class="chip" style="background:${corCand(nr)}"></span><span class="q">${t}º turno ${esc(onde)}</span><span class="r">${esc(nomeC(nr))} venceu com ${pct(r.wShare)}, ${(margem * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} pontos à frente</span></div>`;
+}
+function vencedorCor(v, p) { const r = resumo(v, p, ST.turno); return { r, cor: r && r.validos && !r.tie ? corCand(CANDS[ST.turno][r.w][0]) : COR.empate }; }
+
+function render() {
+  migalhas();
+  const t = ST.turno, corpo = $('#corpo');
+  let h = '';
+  const nac = resumo(BR.tot['v' + t], BR.tot['p' + t], t);
+  if (ST.nivel === 'br') {
+    h += `<div class="bu-cab"><span>Presidente · ${t}º turno</span><span>Brasil</span></div><h2>Resultado no Brasil</h2>`;
+    h += manchete(nac, 'no país') + blocoResultado(nac);
+    if (BR.exterior) h += `<p class="dica">Inclui ${fmt(BR.extTot['v' + t].reduce((a, b) => a + b, 0))} votos do exterior, que não aparecem no mapa.</p>`;
+    h += '<div class="secao-tit"><span>Estados</span><span>vencedor</span></div><ul class="lista">';
+    const ufs = Object.keys(BR.ufs).sort();
+    for (const uf of ufs) { const U = BR.ufs[uf]; const { r, cor } = vencedorCor(U['v' + t], U['p' + t]); h += `<li><button type="button" data-uf="${uf}"><span class="dot" style="background:${cor}"></span><span class="l1">${NOME_UF[uf]}</span><span class="l2">${esc(nomeC(CANDS[t][r.w][0]))}</span><span class="v">${pct(r.wShare)}</span></button></li>`; }
+    h += '</ul><p class="dica">Clique num município do mapa ou busque uma cidade, bairro, escola ou CEP para ver cada local de votação.</p>';
+  } else if (ST.nivel === 'uf') {
+    const U = BR.ufs[ST.uf], r = resumo(U['v' + t], U['p' + t], t);
+    h += `<div class="bu-cab"><span>Presidente · ${t}º turno</span><span>${ST.uf}</span></div><h2>${NOME_UF[ST.uf]}</h2>`;
+    h += manchete(r, 'no estado') + blocoResultado(r, nac, 'Brasil');
+    const ms = MUNI_LIST.filter(m => m.uf === ST.uf);
+    h += `<div class="secao-tit"><span>Municípios (${ms.length})</span><span>vencedor</span></div><input class="filtro" id="filtroLista" type="search" placeholder="Filtrar municípios" aria-label="Filtrar municípios"><ul class="lista" id="lista"></ul>`;
+    corpo.innerHTML = h; listaMunis(ms); posRender(); return;
+  } else if (ST.nivel === 'muni') {
+    const m = BR.munis[ST.muni], r = resumo(m['v' + t], m['p' + t], t);
+    const U = BR.ufs[m.uf], ru = resumo(U['v' + t], U['p' + t], t);
+    h += `<div class="bu-cab"><span>Presidente · ${t}º turno</span><span>${m.uf}</span></div><h2>${esc(m.n)}</h2>`;
+    h += manchete(r, 'no município') + blocoResultado(r, ru, m.uf);
+    const u = UFC[m.uf];
+    if (!u) h += '<p class="dica">Carregando locais de votação…</p>';
+    else {
+      const mi = u.muniIdx[ST.muni], lst = u.d.munis[mi].locais;
+      h += `<div class="secao-tit"><span>Locais de votação (${lst.length})</span><span>vencedor</span></div><input class="filtro" id="filtroLista" type="search" placeholder="Filtrar por escola, bairro ou endereço" aria-label="Filtrar locais"><ul class="lista" id="lista"></ul>`;
+      corpo.innerHTML = h; listaLocais(u, lst); posRender(); return;
+    }
+  } else if (ST.nivel === 'cel') {
+    const u = UFC[ST.uf], o = u.cel.get(ST.cel);
+    const ls = o.ids.map(i => u.d.locais[i]);
+    const m = u.d.munis[ls[0][0]];
+    const r = resumo(o['v' + t], o['p' + t], t);
+    const rm = resumo(m['v' + t], m['p' + t], t);
+    const l0 = ls[0];
+    h += `<div class="bu-cab"><span>Boletim do local · ${t}º turno</span><span>Zona ${l0[1]}</span></div>`;
+    h += `<h2>${esc(titulo(l0[3]))}</h2><p class="end">${esc(titulo(l0[4]))}${l0[5] ? ' · ' + esc(titulo(l0[5])) : ''}${l0[6] ? ' · CEP ' + fmtCep(l0[6]) : ''}<br>${esc(m.n)} (${ST.uf})</p>`;
+    if (ls.length > 1) h += `<div class="aviso">${ls.length} locais de votação funcionam neste endereço. O resultado abaixo soma todos.</div>`;
+    if (ls.some(l => l[8] === 1)) h += '<div class="aviso">A coordenada do TSE para este local estava ausente ou fora do município. A posição foi estimada pelo CEP.</div>';
+    h += manchete(r, 'neste local') + blocoResultado(r, rm, m.n);
+    if (ls.length > 1) {
+      h += '<div class="secao-tit"><span>Locais neste endereço</span><span>vencedor</span></div><ul class="lista">';
+      for (const l of ls) { const { r: rr, cor } = vencedorCor(l[t === 1 ? 10 : 12], l[t === 1 ? 11 : 13]); h += `<li><button type="button" tabindex="-1"><span class="dot" style="background:${cor}"></span><span class="l1">${esc(titulo(l[3]))}</span><span class="l2">Zona ${l[1]} · local ${l[2]}</span><span class="v">${rr && rr.validos ? pct(rr.wShare) : '—'}</span></button></li>`; }
+      h += '</ul>';
+    }
+    h += `<div class="serrilha" role="presentation"></div><p class="dica">A área colorida reúne os pontos mais próximos deste local do que de qualquer outro do município. É uma aproximação da vizinhança, não o endereço dos eleitores.</p>`;
+  }
+  corpo.innerHTML = h; posRender();
+}
+function posRender() {
+  const b = $('[data-mais]'); if (b) b.onclick = () => { $('#maisCands').hidden = false; b.remove(); };
+}
+function listaMunis(ms) {
+  const t = ST.turno, ul = $('#lista'), inp = $('#filtroLista');
+  const desenha = () => {
+    const q = norm(inp.value);
+    const f = q ? ms.filter(m => m.nn.includes(q)) : ms;
+    ul.innerHTML = f.slice(0, 250).map(m => { const { r, cor } = vencedorCor(m.ref['v' + t], m.ref['p' + t]); return `<li><button type="button" data-muni="${m.ibge}"><span class="dot" style="background:${cor}"></span><span class="l1">${esc(m.n)}</span><span class="l2">${fmt(m.aptos)} eleitores · ${esc(nomeC(CANDS[t][r.w][0]))}</span><span class="v">${pct(r.wShare)}</span></button></li>`; }).join('') + (f.length > 250 ? `<li class="dica">Mostrando 250 de ${f.length}. Use o filtro.</li>` : '');
+  };
+  inp.oninput = desenha; desenha();
+}
+function listaLocais(u, lst) {
+  const t = ST.turno, ul = $('#lista'), inp = $('#filtroLista');
+  const it = lst.map(i => { const l = u.d.locais[i]; return { i, l, k: norm(l[3] + ' ' + l[4] + ' ' + l[5] + ' ' + l[6]), ap: ((t === 1 ? l[11] : l[13]) || [0])[0] }; }).sort((a, b) => b.ap - a.ap);
+  const desenha = () => {
+    const q = norm(inp.value);
+    const f = q ? it.filter(x => x.k.includes(q)) : it;
+    ul.innerHTML = f.slice(0, 300).map(({ l }) => {
+      const { r, cor } = vencedorCor(l[t === 1 ? 10 : 12], l[t === 1 ? 11 : 13]);
+      const sem = l[7] < 0;
+      return `<li><button type="button" ${sem ? 'disabled' : `data-cel="${l[7]}"`}><span class="dot" style="background:${r && r.validos ? cor : COR.land}"></span><span class="l1">${esc(titulo(l[3]))}</span><span class="l2">${esc(titulo(l[5]) || titulo(l[4]))}${sem ? ' · sem posição no mapa' : ''}</span><span class="v">${r && r.validos ? pct(r.wShare) : '—'}</span></button></li>`;
+    }).join('') + (f.length > 300 ? `<li class="dica">Mostrando 300 de ${f.length}. Use o filtro.</li>` : '') + (!f.length ? '<li class="dica">Nenhum local encontrado.</li>' : '');
+  };
+  inp.oninput = desenha; desenha();
+}
+$('#corpo').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.uf) selecionarUF(b.dataset.uf);
+  else if (b.dataset.muni) selecionarMuni(b.dataset.muni);
+  else if (b.dataset.cel) selecionarCelula(+b.dataset.cel, true);
+});
+$('#migalhas').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.ir === 'br') selecionarBrasil();
+  else if (b.dataset.ir === 'uf') selecionarUF(b.dataset.uf);
+  else if (b.dataset.ir === 'muni') selecionarMuni(ST.muni);
+});
+$('#alca').addEventListener('click', () => $('#painel').classList.toggle('recolhido'));
+
+// ---------- legenda ----------
+function legenda() {
+  const t = ST.turno, el = $('#legenda');
+  let h = '';
+  if (ST.modo === 'vencedor') {
+    h += `<div class="tit">Vencedor no local · % dos válidos</div>`;
+    const vencedores = t === 2 ? [13, 22] : [13, 22, 55];
+    for (const nr of vencedores) h += `<div class="leg-linha"><span>${esc(nomeC(nr))}</span><span class="leg-rampa">${ALF_V.map(a => `<i style="background:${mix(corCand(nr), COR.land, a)}"></i>`).join('')}</span></div>`;
+    h += `<div class="leg-escala"><span></span><div>${LBL_V[t].map(x => `<span>${x}</span>`).join('')}</div></div>`;
+  } else {
+    const bins = binsCand(ST.cand), lab = ['0', ...bins.map(b => String(Math.round(b * 100)))].map((x, i) => i === 5 ? x + '+' : x);
+    h += `<div class="tit">${esc(nomeC(ST.cand))} · % dos válidos</div>`;
+    h += `<div class="leg-linha"><span>${esc(nomeC(ST.cand))}</span><span class="leg-rampa">${ALF_C.map(a => `<i style="background:${mix(corModoCand(ST.cand), COR.land, a)}"></i>`).join('')}</span></div>`;
+    h += `<div class="leg-escala"><span></span><div>${lab.map(x => `<span>${x}</span>`).join('')}</div></div>`;
+  }
+  h += `<div class="leg-extra">${ST.modo === 'vencedor' ? `<span><i style="background:${COR.empate}"></i>Empate</span>` : ''}<span><i style="background:${COR.land}"></i>Sem votação</span></div>`;
+  el.innerHTML = h;
+}
+
+// ---------- controles ----------
+function preencherSelect() {
+  const sel = $('#selCand'), t = ST.turno;
+  sel.innerHTML = CANDS[t].filter(c => c[0] < 90).map(c => `<option value="${c[0]}">${esc(nomeC(c[0]))} (${c[0]})</option>`).join('');
+  if (IDX[t][ST.cand] == null) ST.cand = 13;
+  sel.value = ST.cand;
+}
+$$('[data-turno]').forEach(b => b.addEventListener('click', () => {
+  ST.turno = +b.dataset.turno; $$('[data-turno]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  preencherSelect(); pintar(); render();
+}));
+$$('[data-modo]').forEach(b => b.addEventListener('click', () => {
+  ST.modo = b.dataset.modo; $$('[data-modo]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  $('#selCand').hidden = ST.modo !== 'cand'; pintar(); render();
+}));
+$('#selCand').addEventListener('change', e => { ST.cand = +e.target.value; pintar(); render(); });
+
+// ---------- busca ----------
+const inp = $('#busca'), ulr = $('#resultados');
+let itens = [], selI = -1, tBusca;
+function fecharBusca() { ulr.hidden = true; $('#buscaBox').setAttribute('aria-expanded', 'false'); selI = -1; }
+function mostrar(lista, vazio) {
+  itens = lista; selI = lista.length ? 0 : -1;
+  ulr.innerHTML = lista.length ? lista.map((x, i) => `<li role="option" id="op${i}" aria-selected="${i === selI}" data-i="${i}"><span class="tipo">${x.tipo}</span><span class="t1">${esc(x.t1)}</span><span class="t2">${esc(x.t2)}</span></li>`).join('') : `<li class="vazio">${esc(vazio || 'Nada encontrado.')}</li>`;
+  ulr.hidden = false; $('#buscaBox').setAttribute('aria-expanded', 'true');
+}
+async function buscar(qraw) {
+  const q = norm(qraw);
+  if (!q) { fecharBusca(); return; }
+  const dig = qraw.replace(/\D/g, '');
+  if (/^\d{5}-?\d{0,3}$/.test(qraw.trim()) && dig.length >= 5) {
+    if (!CEP) { try { CEP = await getJSON('data/cep.json'); } catch (e) { CEP = {}; } }
+    const c5 = dig.slice(0, 5), e = CEP[c5];
+    if (e) { const m = BR.munis[e[2]]; mostrar([{ tipo: 'CEP', t1: `${c5}-${dig.slice(5) || 'xxx'}`, t2: `Área do CEP em ${m.n} (${m.uf})`, acao: () => irParaPonto([e[0], e[1]], e[2]) }]); }
+    else mostrar([], 'Nenhum local de votação com esse início de CEP. Tente a busca pelo nome da cidade.');
+    return;
+  }
+  const cidades = [], curB = [], curL = [], outB = [], outL = [];
+  const ms = [];
+  for (const m of MUNI_LIST) { const i = m.nn.indexOf(q); if (i === 0) ms.push([m.nn === q ? 0 : 1, m]); else if (i > 0) ms.push([2, m]); }
+  ms.sort((a, b) => a[0] - b[0] || b[1].aptos - a[1].aptos);
+  ms.slice(0, 5).forEach(([, m]) => cidades.push({ tipo: 'Cidade', t1: m.n, t2: `${NOME_UF[m.uf]} · ${fmt(m.aptos)} eleitores`, acao: () => selecionarMuni(m.ibge) }));
+  const u = UFC[ST.uf];
+  if (u && q.length >= 3) {
+    const atual = ST.muni && u.muniIdx[ST.muni] != null ? u.muniIdx[ST.muni] : -1;
+    const bs = u.bairros.filter(b => norm(b.nome).includes(q)).sort((a, b) => (norm(b.nome).startsWith(q)) - (norm(a.nome).startsWith(q)) || b.w - a.w);
+    for (const b of bs) { const m = u.d.munis[b.m]; const it = { tipo: 'Bairro', t1: titulo(b.nome), t2: `${m.n} (${u.uf}) · ${b.n} ${b.n > 1 ? 'locais' : 'local'}`, acao: () => irParaPonto(b.xy, m.ibge) }; (b.m === atual ? curB : outB).push(it); }
+    let n = 0;
+    for (const l of u.d.locais) {
+      if (l[7] < 0) continue; const k = norm(l[3] + ' ' + l[4]); if (!k.includes(q)) continue;
+      const m = u.d.munis[l[0]]; const it = { tipo: 'Local', t1: titulo(l[3]), t2: `${titulo(l[4])} · ${m.n}`, acao: () => selecionarCelula(l[7], true) };
+      (l[0] === atual ? curL : outL).push(it); if (++n > 300) break;
+    }
+  }
+  const out = [...curB.slice(0, 4), ...cidades, ...curL.slice(0, 5), ...outB.slice(0, 3), ...outL.slice(0, 3)];
+  if (EXTERNO && q.length >= 6) out.push({ tipo: 'Endereço', t1: `Procurar “${qraw}”`, t2: 'Endereço no OpenStreetMap', acao: () => nominatim(qraw) });
+  mostrar(out, u ? 'Nada encontrado. Tente o nome da cidade, do bairro, da escola ou um CEP.' : 'Nada encontrado. Escolha uma cidade para buscar bairros e escolas, ou digite um CEP.');
+}
+async function nominatim(q) {
+  try {
+    const r = await getJSON('https://nominatim.openstreetmap.org/search?format=json&countrycodes=br&limit=1&q=' + encodeURIComponent(q));
+    if (!r[0]) return mostrar([], 'Endereço não encontrado.');
+    pontoLivre([+r[0].lon, +r[0].lat]);
+  } catch (e) { mostrar([], 'A busca de endereço não está disponível agora.'); }
+}
+function pontoLivre(xy) {
+  for (const m of MUNI_LIST) {
+    const f = MUNI_FEAT[m.g]; if (!f) continue;
+    const bb = f.__bb || (f.__bb = bboxGeom(f.geometry));
+    if (xy[0] < bb[0][0] || xy[0] > bb[1][0] || xy[1] < bb[0][1] || xy[1] > bb[1][1]) continue;
+    if (dentro(xy, f.geometry)) return irParaPonto(xy, m.ibge);
+  }
+  mostrar([], 'Esse ponto fica fora dos municípios do mapa.');
+}
+inp.addEventListener('input', () => { clearTimeout(tBusca); tBusca = setTimeout(() => buscar(inp.value), 120); });
+inp.addEventListener('keydown', e => {
+  if (ulr.hidden) return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!itens.length) return; selI = (selI + (e.key === 'ArrowDown' ? 1 : -1) + itens.length) % itens.length; $$('li[role=option]', ulr).forEach((li, i) => li.setAttribute('aria-selected', i === selI)); inp.setAttribute('aria-activedescendant', 'op' + selI); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (itens[selI]) { const a = itens[selI].acao; fecharBusca(); inp.blur(); a(); } }
+  else if (e.key === 'Escape') fecharBusca();
+});
+ulr.addEventListener('mousedown', e => { const li = e.target.closest('li[data-i]'); if (!li) return; e.preventDefault(); const a = itens[+li.dataset.i].acao; fecharBusca(); inp.blur(); a(); });
+inp.addEventListener('blur', () => setTimeout(fecharBusca, 150));
+inp.addEventListener('focus', () => { if (inp.value) buscar(inp.value); });
+$('#btnGeo').addEventListener('click', () => {
+  const falha = () => { inp.focus(); mostrar([], 'Não foi possível usar sua localização aqui. Digite seu CEP ou o nome do bairro.'); };
+  if (!navigator.geolocation) return falha();
+  try { navigator.geolocation.getCurrentPosition(p => pontoLivre([p.coords.longitude, p.coords.latitude]), falha, { timeout: 8000 }); } catch (e) { falha(); }
+});
+
+// ---------- sobre ----------
+$('#abrirSobre').addEventListener('click', () => { $('#sobreFundo').hidden = false; $('#fecharSobre').focus(); });
+$('#fecharSobre').addEventListener('click', () => { $('#sobreFundo').hidden = true; $('#abrirSobre').focus(); });
+$('#sobreFundo').addEventListener('click', e => { if (e.target.id === 'sobreFundo') $('#sobreFundo').hidden = true; });
+addEventListener('keydown', e => { if (e.key === 'Escape') $('#sobreFundo').hidden = true; });
+
+const NOME_UF = { AC: 'Acre', AL: 'Alagoas', AM: 'Amazonas', AP: 'Amapá', BA: 'Bahia', CE: 'Ceará', DF: 'Distrito Federal', ES: 'Espírito Santo', GO: 'Goiás', MA: 'Maranhão', MG: 'Minas Gerais', MS: 'Mato Grosso do Sul', MT: 'Mato Grosso', PA: 'Pará', PB: 'Paraíba', PE: 'Pernambuco', PI: 'Piauí', PR: 'Paraná', RJ: 'Rio de Janeiro', RN: 'Rio Grande do Norte', RO: 'Rondônia', RR: 'Roraima', RS: 'Rio Grande do Sul', SC: 'Santa Catarina', SE: 'Sergipe', SP: 'São Paulo', TO: 'Tocantins' };
+
+// ---------- início ----------
+async function iniciar() {
+  lerCores();
+  let ruas;
+  [BR, MAPA, ruas] = await Promise.all([getJSON('data/brasil.json'), getJSON('data/brasil_mapa.json'), EXTERNO ? estiloRuas() : null]);
+  CANDS = { 1: BR.cands['1'], 2: BR.cands['2'] };
+  IDX = { 1: {}, 2: {} }; for (const t of [1, 2]) CANDS[t].forEach((c, i) => IDX[t][c[0]] = i);
+  BR.tot = { v1: null, v2: null, p1: null, p2: null };
+  for (const uf in BR.ufs) for (const k of ['v1', 'v2', 'p1', 'p2']) BR.tot[k] = soma(BR.tot[k], BR.ufs[uf][k]);
+  BR.extTot = { v1: null, v2: null };
+  for (const e of BR.exterior || []) for (const t of [1, 2]) { BR.tot['v' + t] = soma(BR.tot['v' + t], e['v' + t]); BR.tot['p' + t] = somaP(BR.tot['p' + t], [...e['p' + t], 0]); BR.extTot['v' + t] = soma(BR.extTot['v' + t], e['v' + t]); }
+  for (const t of [1, 2]) { const r = resumo(BR.tot['v' + t], null, t); NAC[t] = {}; CANDS[t].forEach((c, i) => NAC[t][c[0]] = r.validos ? r.v[i] / r.validos : 0); }
+  for (const ib in BR.munis) {
+    const m = BR.munis[ib]; UFCOD[m.uf] = ib.slice(0, 2); UFSIG[ib.slice(0, 2)] = m.uf;
+    const G = GEO[m.g] || (GEO[m.g] = { v1: null, v2: null, p1: null, p2: null, nomes: [], ibges: [], uf: m.uf });
+    G.v1 = soma(G.v1, m.v1); G.v2 = soma(G.v2, m.v2); G.p1 = somaP(G.p1, m.p1); G.p2 = somaP(G.p2, m.p2); G.nomes.push(m.n); G.ibges.push(ib);
+    MUNI_LIST.push({ ibge: ib, g: m.g, n: m.n, nn: norm(m.n), uf: m.uf, aptos: (m.p2 || m.p1)[0], ref: m });
+  }
+  for (const g in GEO) GEO[g].nome = GEO[g].nomes.join(' e ');
+  MUNI_LIST.sort((a, b) => b.aptos - a.aptos);
+  const nAprox = 1147, nSem = 131;
+  preencherSelect(); render(); legenda();
+  if (EXTERNO) $('#sobreAmbiente').textContent = 'O mapa de ruas vem do OpenFreeMap, com dados do OpenStreetMap. A busca de endereço consulta o Nominatim, do OpenStreetMap, só quando você escolhe “Procurar” na lista.';
+  else $('#sobreAmbiente').textContent = 'Nesta versão o mapa é autossuficiente: não carrega mapa de ruas nem serviços externos. A busca usa só os dados do TSE (cidades, bairros, escolas e CEPs dos locais de votação).';
+  montarMapa(ruas);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', aplicarTema);
+  new MutationObserver(aplicarTema).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  addEventListener('hashchange', abrirHash);
+  if (innerWidth <= 760) $('#painel').classList.add('recolhido');
+}
+iniciar().catch(err => { console.error(err); carregando(true, 'Não foi possível carregar os dados. Recarregue a página.'); });
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<div id="map" aria-label="Mapa dos locais de votação"></div>
+<div id="ui">
+  <section class="comando" aria-label="Busca e filtros">
+    <div class="marca">
+      <h1>Vizinhança Eleitoral <span>2026</span></h1>
+      <button class="link-sobre" id="abrirSobre" type="button">Como foi feito</button>
+    </div>
+    <p class="sub">Quem venceu a eleição para presidente em cada local de votação do Brasil.</p>
+    <div class="busca" role="combobox" aria-haspopup="listbox" aria-owns="resultados" aria-expanded="false" id="buscaBox">
+      <input id="busca" type="search" autocomplete="off" spellcheck="false" placeholder="Cidade, bairro, escola ou CEP" aria-label="Buscar cidade, bairro, local de votação ou CEP" aria-controls="resultados">
+      <button class="btn-geo" id="btnGeo" type="button" title="Usar minha localização" aria-label="Usar minha localização">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
+      <ul class="resultados" id="resultados" role="listbox" hidden></ul>
+    </div>
+    <div class="controles">
+      <div class="seg" role="group" aria-label="Turno">
+        <button type="button" data-turno="1" aria-pressed="false">1º turno</button>
+        <button type="button" data-turno="2" aria-pressed="true">2º turno</button>
+      </div>
+      <div class="seg" role="group" aria-label="Modo do mapa">
+        <button type="button" data-modo="vencedor" aria-pressed="true">Vencedor</button>
+        <button type="button" data-modo="cand" aria-pressed="false">Candidato</button>
+      </div>
+      <select id="selCand" aria-label="Candidato" hidden></select>
+    </div>
+  </section>
+  <aside class="painel" id="painel" aria-live="polite">
+    <button class="painel-alca" id="alca" type="button" aria-label="Expandir ou recolher painel"><span></span></button>
+    <nav class="migalhas" id="migalhas" aria-label="Navegação"></nav>
+    <div class="painel-corpo" id="corpo"></div>
+  </aside>
+  <div class="legenda" id="legenda"></div>
+</div>
+<div id="tip" hidden></div>
+<div class="carregando" id="carregando">Carregando dados do TSE…</div>
+<div class="sobre-fundo" id="sobreFundo" hidden>
+  <div class="sobre" role="dialog" aria-modal="true" aria-labelledby="sobreTit">
+    <button class="fechar" id="fecharSobre" type="button">Fechar</button>
+    <h2 id="sobreTit">Como foi feito</h2>
+    <p>O mapa divide cada município em áreas de influência dos locais de votação. Cada área reúne os pontos mais próximos de um local do que de qualquer outro (um diagrama de Voronoi), recortada pela fronteira do município. A cor mostra quem venceu naquele local, e a intensidade mostra a fatia de votos válidos do vencedor.</p>
+    <h3>O que a área significa</h3>
+    <p>A área é uma aproximação da vizinhança atendida por cada escola ou prédio de votação. O eleitor vota onde fez o título, que nem sempre é perto de casa. Em zonas rurais e em municípios grandes, as áreas ficam extensas e cobrem lugares sem moradores.</p>
+    <h3>Dados</h3>
+    <ul>
+      <li>Votos por seção eleitoral para presidente, 1º e 2º turnos (TSE, arquivo gerado em 26/10/2026).</li>
+      <li>Detalhe da apuração por seção: eleitores aptos e comparecimento (TSE, 26/10/2026).</li>
+      <li>Eleitorado por local de votação, com endereço, bairro, CEP e coordenadas (TSE, 25/10/2026).</li>
+      <li>Malha municipal do IBGE, resolução máxima, simplificada para a web.</li>
+    </ul>
+    <h3>Tratamentos</h3>
+    <ul>
+      <li>Votos e locais foram casados pela seção eleitoral. Locais provisórios aparecem no cadastro com número novo, e a seção resolve a diferença.</li>
+      <li id="sobreNumeros">Locais com coordenada ausente ou fora do município foram posicionados pela média dos outros locais com o mesmo CEP. Os que não puderam ser posicionados aparecem só na lista do município.</li>
+      <li>Locais no mesmo endereço formam uma única área, com o resultado somado.</li>
+      <li>Boa Esperança do Norte (MT) ainda não tem polígono na malha do IBGE. Suas áreas foram calculadas junto com Nova Ubiratã, de onde o município foi desmembrado.</li>
+      <li>Votos do exterior entram nos totais do Brasil, mas não no mapa.</li>
+      <li>Leonardo Araújo aparece no arquivo de votos por seção, mas não no arquivo consolidado de candidatos do TSE. Seus votos são mostrados como registrados por seção.</li>
+      <li>Percentuais de candidatos são sobre votos válidos, sem brancos e nulos. Comparecimento e abstenção são sobre eleitores aptos.</li>
+    </ul>
+    <h3>Referência</h3>
+    <p>Inspirado nos mapas de vizinhanças do Estadão (2018) e na ferramenta “Como votou minha vizinhança” (2026). Este mapa é independente e foi refeito do zero com dados públicos.</p>
+    <p id="sobreAmbiente"></p>
+  </div>
+</div>
